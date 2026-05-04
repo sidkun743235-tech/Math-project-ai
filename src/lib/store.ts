@@ -11,6 +11,7 @@ const STORAGE_KEYS = {
   TIMETABLE: 'rupak_math_timetable',
   CURRENT_USER: 'rupak_math_current_user',
   PAYMENT_CONFIG: 'rupak_math_payment_config',
+  CHAT_GROUPS: 'rupak_math_chat_groups',
 };
 
 // ... existing defaults ...
@@ -102,6 +103,9 @@ export const store = {
     qrCodeUrl: null
   }),
   setPaymentConfig: (config: PaymentConfig) => setStore(STORAGE_KEYS.PAYMENT_CONFIG, config),
+  
+  getChatGroups: () => getStore<string[]>(STORAGE_KEYS.CHAT_GROUPS, ['Global Chat', 'Infinity Class 5', 'Infinity Class 6', 'Infinity Class 7', 'Infinity Class 8', 'Infinity Class 9', 'Infinity Class 10', 'Infinity Class 11', 'Infinity Class 12']),
+  setChatGroups: (groups: string[]) => setStore(STORAGE_KEYS.CHAT_GROUPS, groups),
   
   clearDemoData: () => {
     const admin = store.getUsers().find(u => u.role === 'admin' && u.isSubscriptionPaid);

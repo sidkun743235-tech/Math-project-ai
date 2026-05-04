@@ -45,6 +45,7 @@ export interface Exam {
   duration: number; // in minutes
   questions: Question[];
   published: boolean;
+  resultsPublished?: boolean; // Admin can toggle score list visibility
   createdAt: number;
   expiresAt?: number; // 72 hours window
 }
@@ -78,6 +79,7 @@ export interface Note {
   content: string;
   type: 'text' | 'file';
   fileUrl?: string;
+  isPublished?: boolean; 
   createdAt: number;
 }
 

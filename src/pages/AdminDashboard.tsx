@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Routes, Route, Link, useNavigate } from 'react-router-dom';
+import { Logo } from '@/components/Logo';
 import { 
   LayoutDashboard, 
   Users, 
@@ -38,9 +39,13 @@ import {
   Timer,
   LayoutGrid,
   ChevronLeft,
-  User as UserIcon
+  Key,
+  User as UserIcon,
+  QrCode,
+  ShieldCheck
 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Button, buttonVariants } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { 
@@ -222,7 +227,7 @@ export default function AdminDashboard({ user, onLogout }: AdminDashboardProps) 
   const handleTogglePayment = (studentId: string) => {
     const updated = users.map(u => {
       if (u.id === studentId) {
-        return { ...u, paymentStatus: u.paymentStatus === 'paid' ? 'due' : 'paid' };
+        return { ...u, paymentStatus: (u.paymentStatus === 'paid' ? 'due' : 'paid') as 'paid' | 'due' };
       }
       return u;
     });
@@ -244,352 +249,133 @@ export default function AdminDashboard({ user, onLogout }: AdminDashboardProps) 
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 flex">
-      {/* Sidebar */}
-      <aside className="w-64 bg-slate-950 text-white hidden md:flex flex-col border-r border-white/5">
-        <div className="p-6 flex items-center gap-3 border-b border-white/5 bg-white/5">
-          <div className="w-10 h-10 border-2 border-blue-500 rounded-full overflow-hidden shadow-lg bg-white p-0.5">
-            <img src="/input_file_0.png" alt="Infinity Logo" className="w-full h-full object-cover rounded-full" referrerPolicy="no-referrer" />
-          </div>
-          <div>
-            <h2 className="font-black text-lg leading-tight tracking-tighter text-white italic">INFINITY</h2>
-            <p className="text-[10px] text-blue-400 uppercase tracking-widest font-black">Bongaon</p>
-          </div>
-        </div>
-        <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
-          <SidebarItem icon={<LayoutDashboard />} label="Overview" active={activeTab === 'overview'} onClick={() => setActiveTab('overview')} />
-          <SidebarItem icon={<Users />} label="Students" active={activeTab === 'students'} onClick={() => setActiveTab('students')} />
-          <SidebarItem icon={<Calendar />} label="Timetable" active={activeTab === 'timetable'} onClick={() => setActiveTab('timetable')} />
-          <SidebarItem icon={<TrendingUp />} label="Growth" active={activeTab === 'growth'} onClick={() => setActiveTab('growth')} />
-          <SidebarItem icon={<FileText />} label="Exams" active={activeTab === 'exams'} onClick={() => setActiveTab('exams')} />
-          <SidebarItem icon={<BookOpen />} label="Notes" active={activeTab === 'notes'} onClick={() => setActiveTab('notes')} />
-          <SidebarItem icon={<CreditCard />} label="Payments" active={activeTab === 'receive' || activeTab === 'due-list'} onClick={() => setActiveTab('receive')} />
-          <SidebarItem icon={<Users2 />} label="Attendance" active={activeTab === 'attendance'} onClick={() => setActiveTab('attendance')} />
-          <SidebarItem icon={<Trophy />} label="Results" active={activeTab === 'results'} onClick={() => setActiveTab('results')} />
-          <SidebarItem icon={<MessageCircle />} label="Community Hub" active={activeTab === 'chats'} onClick={() => setActiveTab('chats')} />
-        </nav>
-        <div className="p-4 border-t border-white/5 bg-white/5">
-          <Button variant="ghost" className="w-full justify-start text-slate-400 hover:text-white hover:bg-white/10" onClick={onLogout}>
-            <LogOut className="mr-2 h-4 w-4" />
-            Logout
-          </Button>
-        </div>
-      </aside>
-
-      {/* Main Content */}
-      <main className="flex-1 flex flex-col bg-slate-50">
-        {/* Top Navbar */}
-        <header className="h-16 bg-white border-b px-6 flex items-center justify-between sticky top-0 z-10 shadow-sm">
-          <div className="flex items-center gap-2">
-            <div className="flex items-center gap-2 bg-slate-100 p-2 rounded-xl">
-              <div className="w-8 h-8 border-2 border-blue-600 rounded-full overflow-hidden shadow-sm bg-white p-0.5">
-                <img src="/input_file_0.png" alt="Infinity Logo" className="w-full h-full object-cover rounded-full" referrerPolicy="no-referrer" />
-              </div>
-              
-              {/* The 3-dots menu categorized as requested */}
-              <Sheet open={isActionsOpen} onOpenChange={setIsActionsOpen}>
-                <SheetTrigger className="h-8 w-8 hover:bg-slate-200 rounded-full flex items-center justify-center outline-none transition-colors cursor-pointer">
-                  <MoreVertical className="h-4 w-4 text-slate-600" />
-                </SheetTrigger>
-                <SheetContent side="left" className="w-80 p-0 border-none bg-slate-950 text-white">
-                  <SheetHeader className="p-6 border-b border-white/5 bg-white/5">
-                    <div className="flex items-center gap-3">
-                      <Avatar className="h-12 w-12 border-2 border-blue-500/50">
-                        <AvatarFallback className="bg-blue-600 text-white text-lg font-bold">
-                          {user.name.charAt(0)}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div className="text-left">
-                        <SheetTitle className="text-white text-lg font-black tracking-tight">{user.name}</SheetTitle>
-                        <SheetDescription className="text-blue-400 text-[10px] uppercase tracking-widest font-bold">Practice makes perfect</SheetDescription>
-                      </div>
-                    </div>
-                  </SheetHeader>
-                  <ScrollArea className="h-[calc(100vh-100px)]">
-                    <div className="p-4 space-y-6">
-                      {/* Main Category */}
-                      <div className="space-y-2">
-                        <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest px-2">Main</p>
-                        <div className="space-y-1">
-                          <Button variant="ghost" className="w-full justify-start gap-3 h-11 text-slate-300 hover:bg-white/10 hover:text-white" onClick={() => handleAction('overview')}>
-                            <LayoutDashboard className="w-4 h-4" /> Overview
-                          </Button>
-                          <Button variant="ghost" className="w-full justify-start gap-3 h-11 text-slate-300 hover:bg-white/10 hover:text-white" onClick={() => handleAction('chats')}>
-                            <MessageCircle className="w-4 h-4" /> Community Chat
-                          </Button>
-                        </div>
-                      </div>
-
-                      {/* Manage Category */}
-                      <div className="space-y-2">
-                        <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest px-2">Manage</p>
-                        <div className="space-y-1">
-                          <Button variant="ghost" className="w-full justify-start gap-3 h-11 text-slate-300 hover:bg-white/10 hover:text-white" onClick={() => handleAction('students')}>
-                            <Users className="w-4 h-4" /> Students List
-                          </Button>
-                          <Button variant="ghost" className="w-full justify-start gap-3 h-11 text-slate-300 hover:bg-white/10 hover:text-white" onClick={() => handleAction('add-student')}>
-                            <UserPlus className="w-4 h-4" /> Add New Student
-                          </Button>
-                          <Button variant="ghost" className="w-full justify-start gap-3 h-11 text-slate-300 hover:bg-white/10 hover:text-white" onClick={() => handleAction('attendance')}>
-                            <CheckCircle2 className="w-4 h-4" /> Attendance
-                          </Button>
-                        </div>
-                      </div>
-
-                      {/* Academic Tools Category */}
-                      <div className="space-y-2">
-                        <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest px-2">Academic Tools</p>
-                        <div className="space-y-1">
-                          <Button variant="ghost" className="w-full justify-start gap-3 h-11 text-slate-300 hover:bg-white/10 hover:text-white" onClick={() => handleAction('generate-paper')}>
-                            <FileText className="w-4 h-4" /> Question Paper
-                          </Button>
-                          <Button variant="ghost" className="w-full justify-start gap-3 h-11 text-slate-300 hover:bg-white/10 hover:text-white" onClick={() => handleAction('mcq-manager')}>
-                            <CheckSquare className="w-4 h-4" /> MCQ Manager
-                          </Button>
-                          <Button variant="ghost" className="w-full justify-start gap-3 h-11 text-slate-300 hover:bg-white/10 hover:text-white" onClick={() => handleAction('notes')}>
-                            <BookOpen className="w-4 h-4" /> Study Notes
-                          </Button>
-                          <Button variant="ghost" className="w-full justify-start gap-3 h-11 text-slate-300 hover:bg-white/10 hover:text-white" onClick={() => handleAction('results')}>
-                            <Trophy className="w-4 h-4" /> Exam Results
-                          </Button>
-                        </div>
-                      </div>
-
-                      {/* Fees Category */}
-                      <div className="space-y-2">
-                        <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest px-2">Fees & Finance</p>
-                        <div className="space-y-1">
-                          <Button variant="ghost" className="w-full justify-start gap-3 h-11 text-slate-300 hover:bg-white/10 hover:text-white" onClick={() => handleAction('receive')}>
-                            <CreditCard className="w-4 h-4" /> Receive Payment
-                          </Button>
-                          <Button variant="ghost" className="w-full justify-start gap-3 h-11 text-slate-300 hover:bg-white/10 hover:text-white" onClick={() => handleAction('due-list')}>
-                            <Clock className="w-4 h-4" /> Due List
-                          </Button>
-                        </div>
-                      </div>
-
-                      {/* System Category */}
-                      <div className="space-y-2">
-                        <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest px-2">System</p>
-                        <div className="space-y-1">
-                          <Button variant="ghost" className="w-full justify-start gap-3 h-11 text-slate-300 hover:bg-white/10 hover:text-white" onClick={() => handleAction('settings')}>
-                            <Settings className="w-4 h-4" /> Settings
-                          </Button>
-                          <Button variant="ghost" className="w-full justify-start gap-3 h-11 text-red-400 hover:bg-red-500/10 hover:text-red-300" onClick={onLogout}>
-                            <LogOut className="w-4 h-4" /> Logout
-                          </Button>
-                        </div>
-                      </div>
-                    </div>
-                  </ScrollArea>
-                </SheetContent>
-              </Sheet>
-            </div>
-            <h1 className="text-xl font-black text-slate-900 tracking-tight ml-2 uppercase">{activeTab.replace('-', ' ')}</h1>
-          </div>
-
-          <div className="flex items-center gap-4">
-            <Button variant="ghost" size="icon" className="relative">
-              <Bell className="h-5 w-5" />
-              <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full"></span>
-            </Button>
+    <div className="min-h-screen bg-slate-50">
+      {/* Top Navbar */}
+      <header className="h-16 bg-white border-b px-6 flex items-center justify-between sticky top-0 z-40 shadow-sm">
+        <div className="flex items-center gap-2">
+          <div id="admin-nav-logo-container" className="flex items-center gap-2 bg-slate-100 p-1.5 pr-3 rounded-2xl border border-slate-200">
+            <Logo size="xs" className="border-2 border-blue-600/50 shadow-sm" />
             
-            <Sheet>
+            <Sheet open={isActionsOpen} onOpenChange={setIsActionsOpen}>
               <SheetTrigger render={
-                <Button variant="ghost" size="icon" className="text-slate-500">
-                  <MoreVertical className="h-5 w-5" />
+                <Button variant="ghost" size="icon" className="h-8 w-8 rounded-xl hover:bg-white transition-colors">
+                  <MoreVertical className="h-5 w-5 text-slate-600" />
                 </Button>
               } />
-              <SheetContent className="bg-white border-none shadow-2xl p-0 w-64">
-                <SheetHeader className="p-6 border-b border-slate-50 bg-slate-50/50">
-                  <div className="flex items-center gap-3">
-                    <Avatar className="h-10 w-10 border-2 border-indigo-600">
-                      <AvatarFallback className="bg-indigo-600 text-white font-black">{user.name.charAt(0)}</AvatarFallback>
-                    </Avatar>
-                    <div className="text-left">
-                      <SheetTitle className="text-slate-900 font-black uppercase italic text-sm">{user.name}</SheetTitle>
-                      <SheetDescription className="text-indigo-600 text-[10px] uppercase font-bold tracking-widest leading-none">Senior Administrator</SheetDescription>
+              <SheetContent side="left" className="w-[300px] sm:w-[400px] p-0 border-none bg-slate-900 text-white">
+                <SheetHeader className="p-6 bg-slate-950 border-b border-white/5">
+                  <SheetTitle className="text-white flex items-center gap-3">
+                    <Logo size="xs" />
+                    <span className="font-black italic uppercase tracking-tighter">Admin Menu</span>
+                  </SheetTitle>
+                  <SheetDescription className="text-indigo-300 text-xs uppercase font-bold tracking-widest mt-1">Control Center</SheetDescription>
+                </SheetHeader>
+                
+                <ScrollArea className="h-[calc(100vh-140px)] p-6">
+                  <div className="space-y-8">
+                    <div>
+                      <h3 className="text-[10px] font-black text-indigo-400 uppercase tracking-[0.2em] mb-4 flex items-center gap-2">
+                        <Users2 size={12} /> Management
+                      </h3>
+                      <div className="grid grid-cols-1 gap-2">
+                        <Button variant="ghost" className="justify-start gap-3 h-12 rounded-xl hover:bg-white/10" onClick={() => handleAction('students')}>
+                          <Users size={18} /> <span className="font-bold">Student Database</span>
+                        </Button>
+                        <Button variant="ghost" className="justify-start gap-3 h-12 rounded-xl hover:bg-white/10" onClick={() => handleAction('add-student')}>
+                          <UserPlus size={18} /> <span className="font-bold">Add New Student</span>
+                        </Button>
+                        <Button variant="ghost" className="justify-start gap-3 h-12 rounded-xl hover:bg-white/10" onClick={() => handleAction('attendance')}>
+                          <Clock size={18} /> <span className="font-bold">Post Attendance</span>
+                        </Button>
+                      </div>
+                    </div>
+
+                    <div>
+                      <h3 className="text-[10px] font-black text-emerald-400 uppercase tracking-[0.2em] mb-4 flex items-center gap-2">
+                        <BookOpen size={12} /> Academic
+                      </h3>
+                      <div className="grid grid-cols-1 gap-2">
+                        <Button variant="ghost" className="justify-start gap-3 h-12 rounded-xl hover:bg-white/10" onClick={() => handleAction('exams')}>
+                          <FileText size={18} /> <span className="font-bold">Exams & Papers</span>
+                        </Button>
+                        <Button variant="ghost" className="justify-start gap-3 h-12 rounded-xl hover:bg-white/10" onClick={() => handleAction('notes')}>
+                          <BookOpen size={18} /> <span className="font-bold">Study Notes</span>
+                        </Button>
+                        <Button variant="ghost" className="justify-start gap-3 h-12 rounded-xl hover:bg-white/10" onClick={() => handleAction('results')}>
+                          <Trophy size={18} /> <span className="font-bold">View Results</span>
+                        </Button>
+                        <Button variant="ghost" className="justify-start gap-3 h-12 rounded-xl hover:bg-white/10" onClick={() => handleAction('timetable')}>
+                          <Calendar size={18} /> <span className="font-bold">Timetable</span>
+                        </Button>
+                      </div>
+                    </div>
+
+                    <div>
+                      <h3 className="text-[10px] font-black text-amber-400 uppercase tracking-[0.2em] mb-4 flex items-center gap-2">
+                        <Calculator size={12} /> Finance
+                      </h3>
+                      <div className="grid grid-cols-1 gap-2">
+                        <Button variant="ghost" className="justify-start gap-3 h-12 rounded-xl hover:bg-white/10" onClick={() => handleAction('receive')}>
+                          <CreditCard size={18} /> <span className="font-bold">Receive Payment</span>
+                        </Button>
+                        <Button variant="ghost" className="justify-start gap-3 h-12 rounded-xl hover:bg-white/10" onClick={() => handleAction('due-list')}>
+                          <Bell size={18} /> <span className="font-bold">Due List</span>
+                        </Button>
+                        <Button variant="ghost" className="justify-start gap-3 h-12 rounded-xl hover:bg-white/10" onClick={() => handleAction('growth')}>
+                          <BarChart3 size={18} /> <span className="font-bold">Growth Stats</span>
+                        </Button>
+                      </div>
+                    </div>
+
+                    <div className="pt-4 border-t border-white/5">
+                      <Button variant="ghost" className="w-full justify-start gap-3 h-12 rounded-xl text-red-400 hover:text-red-300 hover:bg-red-400/10" onClick={onLogout}>
+                        <LogOut size={18} /> <span className="font-bold uppercase tracking-widest text-[10px]">Logout</span>
+                      </Button>
                     </div>
                   </div>
-                </SheetHeader>
-                <div className="p-4 space-y-1">
-                  <Button variant="ghost" className="w-full justify-start gap-3 h-11 text-slate-600 hover:bg-slate-50" onClick={() => setActiveTab('settings')}>
-                    <Settings className="w-4 h-4" /> Personal Profile
-                  </Button>
-                  <Button variant="ghost" className="w-full justify-start gap-3 h-11 text-red-600 hover:bg-red-50" onClick={onLogout}>
-                    <LogOut className="w-4 h-4" /> Logout Account
-                  </Button>
-                </div>
+                </ScrollArea>
               </SheetContent>
             </Sheet>
-
-            <div className="flex items-center gap-2">
-              <div className="text-right hidden sm:block">
-                <p className="text-sm font-semibold">{user.name}</p>
-                <p className="text-xs text-slate-500">Math Specialist</p>
-              </div>
-              <Badge className="bg-indigo-600">Admin</Badge>
-            </div>
           </div>
-        </header>
+          <h1 className="text-xl font-black text-slate-900 tracking-tight ml-2 uppercase">{activeTab.replace('-', ' ')}</h1>
+        </div>
+        
+        <div className="flex items-center gap-3">
+          <div className="hidden sm:flex items-center bg-slate-100 p-1 rounded-xl border border-slate-200">
+            <button onClick={() => setActiveTab('overview')} className={cn("px-4 py-1.5 rounded-lg text-[10px] font-black uppercase transition-all", activeTab === 'overview' ? "bg-white text-indigo-600 shadow-sm" : "text-slate-400 hover:text-slate-600")}>Status</button>
+            <button onClick={() => setActiveTab('students')} className={cn("px-4 py-1.5 rounded-lg text-[10px] font-black uppercase transition-all", activeTab === 'students' ? "bg-white text-indigo-600 shadow-sm" : "text-slate-400 hover:text-slate-600")}>Users</button>
+          </div>
+          <Button variant="ghost" size="icon" className="relative" onClick={() => setActiveTab('messages')}>
+            <Bell size={20} className="text-slate-600" />
+            <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full border-2 border-white"></span>
+          </Button>
+          <div className="h-8 w-px bg-slate-200 mx-1"></div>
+          <Button variant="ghost" size="icon" className="rounded-full h-10 w-10 border-2 border-indigo-600" onClick={() => setActiveTab('settings')}>
+            <Avatar className="h-full w-full">
+              <AvatarFallback className="bg-indigo-600 text-white font-bold">{user.name.charAt(0)}</AvatarFallback>
+            </Avatar>
+          </Button>
+        </div>
+      </header>
 
-        {/* Dynamic Content */}
-        <ScrollArea className="flex-1 p-6">
-          <div key={activeTab}>
-            {activeTab === 'growth' && (
-                <div className="space-y-6">
-                  <div className="flex justify-between items-center">
-                    <h2 className="text-3xl font-black tracking-tighter text-slate-900 uppercase">Financial Growth</h2>
-                    <div className="flex items-center gap-2">
-                      <Button variant="outline" size="sm">Last 30 Days</Button>
-                      <Button variant="outline" size="sm">This Year</Button>
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <Card className="bg-linear-to-br from-emerald-500 to-teal-600 text-white border-none shadow-xl">
-                      <CardHeader className="pb-2">
-                        <CardDescription className="text-emerald-100 font-bold uppercase text-[10px] tracking-widest">Monthly Revenue</CardDescription>
-                        <CardTitle className="text-4xl font-black italic">₹{totalRevenue}</CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                        <p className="text-sm font-medium text-emerald-50 flex items-center gap-1">
-                          <TrendingUp className="w-4 h-4" /> +15.4% from last month
-                        </p>
-                      </CardContent>
-                    </Card>
-                    <Card className="shadow-lg border-none">
-                      <CardHeader className="pb-2">
-                        <CardDescription className="text-slate-500 font-bold uppercase text-[10px] tracking-widest">Active Subscriptions</CardDescription>
-                        <CardTitle className="text-3xl font-black">{students.filter(s => s.paymentStatus === 'paid').length}</CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                        <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
-                          <div className="h-full bg-blue-500" style={{ width: `${(students.filter(s => s.paymentStatus === 'paid').length / students.length) * 100}%` }} />
-                        </div>
-                        <p className="text-[10px] text-slate-400 mt-2 font-bold uppercase">Payment Completion Rate</p>
-                      </CardContent>
-                    </Card>
-                    <Card className="shadow-lg border-none">
-                      <CardHeader className="pb-2">
-                        <CardDescription className="text-slate-500 font-bold uppercase text-[10px] tracking-widest">Projected Yearly</CardDescription>
-                        <CardTitle className="text-3xl font-black">₹{totalRevenue * 12}</CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                        <p className="text-sm text-slate-500 font-medium">Based on current student count</p>
-                      </CardContent>
-                    </Card>
-                  </div>
-
-                  <Card className="shadow-xl bg-white border-none">
-                    <CardHeader>
-                      <CardTitle className="text-xl font-black tracking-tight">Revenue Trends</CardTitle>
-                    </CardHeader>
-                    <CardContent className="h-[400px]">
-                      <Bar 
-                        data={{
-                          labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
-                          datasets: [{
-                            label: 'Revenue (₹)',
-                            data: [15000, 18500, 22000, 25000, 21000, totalRevenue],
-                            backgroundColor: 'rgba(59, 130, 246, 0.8)',
-                            borderRadius: 8,
-                          }]
-                        }}
-                        options={{
-                          responsive: true,
-                          maintainAspectRatio: false,
-                          scales: {
-                            y: { beginAtZero: true }
-                          }
-                        }}
-                      />
-                    </CardContent>
-                  </Card>
-                </div>
-              )}
-
-              {activeTab === 'timetable' && (
-                <div className="space-y-6">
-                  <div className="flex justify-between items-center">
-                    <h2 className="text-3xl font-black tracking-tighter text-slate-900 uppercase">Coaching Timetable</h2>
-                    <Button onClick={() => {
-                      const subject = prompt('Subject:');
-                      const cls = prompt('Class (5-12):');
-                      const batch = prompt('Batch (Sr/Jr):') as 'Sr' | 'Jr';
-                      const day = prompt('Day (e.g. Monday):');
-                      const time = prompt('Time (e.g. 2pm):');
-                      if (subject && cls && day && time) {
-                        const newEntry: TimetableEntry = { id: Date.now().toString(), subject, classId: cls, batchType: batch || 'Jr', day, time };
-                        const updated = [...timetable, newEntry];
-                        setTimetable(updated);
-                        store.setTimetable(updated);
-                        toast.success('Timetable updated');
-                      }
-                    }} className="bg-indigo-600 hover:bg-indigo-700">
-                      <Plus className="mr-2 h-4 w-4" /> Create Slot
-                    </Button>
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'].map(day => (
-                      <Card key={day} className="shadow-lg border-none overflow-hidden">
-                        <div className="h-1.5 bg-indigo-500" />
-                        <CardHeader className="bg-slate-50/50 pb-2">
-                          <CardTitle className="text-lg font-black tracking-tight">{day}</CardTitle>
-                        </CardHeader>
-                        <CardContent className="pt-4">
-                          <div className="space-y-3">
-                            {timetable.filter(t => t.day.toLowerCase() === day.toLowerCase()).map(entry => (
-                              <div key={entry.id} className="flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-slate-100 group">
-                                <div className="flex items-center gap-3">
-                                  <div className="p-2 bg-white rounded-lg shadow-xs">
-                                    <Timer className="w-4 h-4 text-indigo-600" />
-                                  </div>
-                                  <div>
-                                    <p className="font-bold text-slate-900 text-sm">{entry.subject}</p>
-                                    <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest">Class {entry.classId} ({entry.batchType}) • {entry.time}</p>
-                                  </div>
-                                </div>
-                                <Button variant="ghost" size="icon" className="h-8 w-8 opacity-0 group-hover:opacity-100 text-red-500" onClick={() => {
-                                  if (confirm('Delete this slot?')) {
-                                    const updated = timetable.filter(t => t.id !== entry.id);
-                                    setTimetable(updated);
-                                    store.setTimetable(updated);
-                                  }
-                                }}>
-                                  <Trash2 className="w-4 h-4" />
-                                </Button>
-                              </div>
-                            ))}
-                            {timetable.filter(t => t.day.toLowerCase() === day.toLowerCase()).length === 0 && (
-                              <p className="text-center text-xs text-slate-400 py-6 italic">No classes scheduled</p>
-                            )}
-                          </div>
-                        </CardContent>
-                      </Card>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {activeTab === 'overview' && (
-                <div className="space-y-6">
-                  {/* Stats Cards */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                    <div onClick={() => setActiveTab('students')} className="cursor-pointer group">
-                      <StatCard title="Total Students" value={students.length} icon={<Users className="text-blue-600" />} trend="+4% from last month" />
-                    </div>
-                    <div onClick={() => setActiveTab('exams')} className="cursor-pointer group">
-                      <StatCard title="Active Exams" value={exams.filter(e => e.published).length} icon={<FileText className="text-purple-600" />} trend="2 upcoming" />
-                    </div>
-                    <div onClick={() => setActiveTab('receive')} className="cursor-pointer group">
-                      <StatCard title="Total Revenue" value={`₹${totalRevenue}`} icon={<CreditCard className="text-emerald-600" />} trend="+12% growth" />
-                    </div>
-                    <div onClick={() => setActiveTab('due-list')} className="cursor-pointer group">
-                      <StatCard title="Pending Dues" value={students.filter(s => s.paymentStatus === 'due').length} icon={<Clock className="text-orange-600" />} trend="Check due list" />
-                    </div>
-                  </div>                  {/* Chart Replacement: Theoretical Section */}
+      {/* Main Content Area */}
+      <main className="p-4 sm:p-8 max-w-7xl mx-auto space-y-8">
+        {activeTab === 'overview' && (
+          <div className="space-y-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              <div onClick={() => setActiveTab('students')} className="cursor-pointer">
+                <StatCard title="Total Students" value={students.length} icon={<Users />} trend="+12 this month" />
+              </div>
+              <div onClick={() => setActiveTab('receive')} className="cursor-pointer">
+                <StatCard title="Revenue" value={`₹${totalRevenue}`} icon={<CreditCard />} trend="Goal: ₹1,00,000" />
+              </div>
+              <div onClick={() => setActiveTab('exams')} className="cursor-pointer">
+                <StatCard title="Active Exams" value={exams.length} icon={<FileText />} trend="Current session" />
+              </div>
+              <div className="cursor-pointer">
+                <StatCard title="Submissions" value={results.length} icon={<CheckCircle2 />} trend="Last 24h" />
+              </div>
+            </div>                  {/* Chart Replacement: Theoretical Section */}
                   <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     <Card className="lg:col-span-2 shadow-xl border-white/40 bg-white/80 backdrop-blur-md overflow-hidden">
                       <CardHeader className="flex flex-row items-center justify-between border-b border-slate-100">
@@ -713,160 +499,217 @@ export default function AdminDashboard({ user, onLogout }: AdminDashboardProps) 
               )}
 
               {activeTab === 'students' && (
-                <div className="space-y-6">
-                  <div className="flex justify-between items-center bg-slate-900 p-6 rounded-3xl text-white shadow-xl">
-                    <div>
-                      <h2 className="text-3xl font-black tracking-tighter uppercase italic">Student List Management</h2>
-                      <p className="text-slate-400 text-sm">Session 2024-25 • {students.length} Total Enrolled</p>
+                <div className="space-y-4 sm:space-y-6 max-w-full overflow-hidden">
+                  <div className="flex flex-wrap flex-col sm:flex-row justify-between items-start sm:items-center bg-slate-900 p-5 sm:p-8 rounded-[1.5rem] sm:rounded-[2rem] text-white shadow-2xl gap-5 sm:gap-6 max-w-full overflow-hidden">
+                    <div className="w-full sm:flex-1">
+                      <h2 className="text-2xl sm:text-4xl font-black tracking-tighter uppercase italic leading-none">Student List</h2>
+                      <p className="text-slate-400 text-[10px] sm:text-sm font-bold uppercase tracking-widest mt-2">Session 2024-25 • {students.length} Scholars Enrolled</p>
                     </div>
-                    <div className="flex gap-3">
-                      <Button onClick={() => setActiveTab('add-student')} className="bg-blue-600 hover:bg-blue-700 shadow-lg shadow-blue-500/20">
-                        <UserPlus className="mr-2 h-4 w-4" /> New Enrolment
+                    <div className="w-full sm:w-auto">
+                      <Button onClick={() => setActiveTab('add-student')} className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 shadow-xl shadow-blue-500/20 rounded-2xl h-12 sm:h-14 px-6 sm:px-8 text-xs sm:text-sm font-black uppercase tracking-wider italic">
+                        <UserPlus className="mr-2 h-5 w-5" /> New Enrolment
                       </Button>
                     </div>
                   </div>
 
-                  {/* Class Distribution Grid */}
-                  <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3">
+                  {/* Class Distribution Grid - 4 columns on mobile for readable touch targets */}
+                  <div className="grid grid-cols-4 sm:grid-cols-4 lg:grid-cols-8 gap-2 sm:gap-4 auto-rows-fr w-full box-border">
                     {['5', '6', '7', '8', '9', '10', '11', '12'].map(cls => (
                       <button
                         key={cls}
                         onClick={() => setSelectedClassFilter(selectedClassFilter === cls ? null : cls)}
-                        className={`p-4 rounded-2xl border-2 transition-all text-left group ${
+                        className={`p-2.5 sm:p-5 rounded-xl sm:rounded-[1.5rem] border-2 transition-all text-left flex flex-col justify-between group h-full active:scale-95 ${
                           selectedClassFilter === cls 
-                          ? 'border-blue-600 bg-blue-50/50 shadow-lg shadow-blue-100 scale-105' 
-                          : 'border-slate-100 bg-white hover:border-blue-200 hover:shadow-md'
+                          ? 'border-blue-600 bg-blue-50 shadow-xl shadow-blue-100' 
+                          : 'border-white bg-white hover:border-blue-100 hover:shadow-lg'
                         }`}
                       >
-                        <p className={`text-[10px] font-black uppercase tracking-widest mb-1 ${selectedClassFilter === cls ? 'text-blue-600' : 'text-slate-400'}`}>Class</p>
-                        <div className="flex items-end justify-between">
-                          <p className={`text-2xl font-black ${selectedClassFilter === cls ? 'text-blue-700' : 'text-slate-900 group-hover:text-blue-600'}`}>{cls}</p>
-                          <p className="text-[10px] font-bold text-slate-400">{students.filter(s => s.class === cls).length} Scholars</p>
+                        <p className={`text-[8px] sm:text-[10px] font-black uppercase tracking-widest mb-1 sm:mb-2 ${selectedClassFilter === cls ? 'text-blue-600' : 'text-slate-400'}`}>Class</p>
+                        <div className="flex items-end justify-between gap-1">
+                          <p className={`text-lg sm:text-3xl font-black leading-none ${selectedClassFilter === cls ? 'text-blue-700' : 'text-slate-900 group-hover:text-blue-600'}`}>{cls}</p>
+                          <div className={`h-1 sm:h-1.5 w-1 sm:w-1.5 rounded-full ${selectedClassFilter === cls ? 'bg-blue-600' : 'bg-slate-200'}`} />
                         </div>
                       </button>
                     ))}
                   </div>
 
-                  <Card className="shadow-2xl border-none bg-white overflow-hidden">
-                    <CardHeader className="bg-slate-50/50 border-b border-slate-100 flex flex-row items-center justify-between">
-                      <CardTitle className="text-xl font-black tracking-tight text-slate-900 uppercase">
-                        {selectedClassFilter ? `Class ${selectedClassFilter} Students` : 'All Enrolled Students'}
-                      </CardTitle>
-                      <div className="flex gap-2">
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between px-1">
+                      <h3 className="text-sm sm:text-xl font-black tracking-tight text-slate-900 uppercase italic">
+                        {selectedClassFilter ? `Class ${selectedClassFilter} Scholars` : 'All Scholars'}
+                      </h3>
+                      <div className="flex gap-1.5">
                         <Button 
                           variant={selectedBatchFilter === 'Sr' ? 'default' : 'outline'} 
                           size="sm" 
                           onClick={() => setSelectedBatchFilter(selectedBatchFilter === 'Sr' ? null : 'Sr')}
-                          className="h-8 rounded-full text-[10px] font-bold"
-                        >Sr Batch</Button>
+                          className="h-8 rounded-xl text-[9px] font-black uppercase tracking-widest px-3"
+                        >Sr</Button>
                         <Button 
                           variant={selectedBatchFilter === 'Jr' ? 'default' : 'outline'} 
                           size="sm" 
                           onClick={() => setSelectedBatchFilter(selectedBatchFilter === 'Jr' ? null : 'Jr')}
-                          className="h-8 rounded-full text-[10px] font-bold"
-                        >Jr Batch</Button>
+                          className="h-8 rounded-xl text-[9px] font-black uppercase tracking-widest px-3"
+                        >Jr</Button>
                       </div>
-                    </CardHeader>
-                    <CardContent className="p-0">
-                      <Table>
-                        <TableHeader className="bg-slate-50">
-                          <TableRow className="hover:bg-transparent border-slate-200">
-                            <TableHead className="font-black text-[10px] text-slate-500 uppercase tracking-widest pl-6">Student Name</TableHead>
-                            <TableHead className="font-black text-[10px] text-slate-500 uppercase tracking-widest">Coaching Schedule</TableHead>
-                            <TableHead className="font-black text-[10px] text-slate-500 uppercase tracking-widest">Finance</TableHead>
-                            <TableHead className="font-black text-[10px] text-slate-500 uppercase tracking-widest">Status</TableHead>
-                            <TableHead className="font-black text-[10px] text-slate-500 uppercase tracking-widest text-right pr-6">Management</TableHead>
-                          </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                          {students
-                            .filter(s => !selectedClassFilter || s.class === selectedClassFilter)
-                            .filter(s => !selectedBatchFilter || s.batchType === selectedBatchFilter)
-                            .map(student => (
-                            <TableRow key={student.id} className="border-slate-50 hover:bg-slate-50/10 transition-colors">
-                              <TableCell className="pl-6 py-4">
-                                <button 
-                                  onClick={() => setSelectedStudentForProfile(student)}
-                                  className="flex items-center gap-3 text-left group"
-                                >
-                                  <Avatar className="h-9 w-9 border-2 border-slate-100 group-hover:border-blue-200 transition-colors">
-                                    <AvatarFallback className="bg-blue-50 text-blue-600 font-black text-xs">{student.name.charAt(0)}</AvatarFallback>
-                                  </Avatar>
-                                  <div>
-                                    <p className="font-bold text-slate-900 text-sm group-hover:text-blue-600 transition-colors flex items-center gap-2">
-                                      {student.name}
-                                      {student.batchType && <Badge variant="outline" className={`text-[8px] h-4 px-1 ${student.batchType === 'Sr' ? 'text-amber-600 bg-amber-50 border-amber-100' : 'text-blue-600 bg-blue-50 border-blue-100'}`}>({student.batchType})</Badge>}
-                                    </p>
-                                    <p className="text-[10px] text-slate-400 font-medium">Class {student.class} Enrolment</p>
-                                  </div>
-                                </button>
-                              </TableCell>
-                              <TableCell>
-                                <div className="space-y-1">
-                                  <div className="flex gap-1">
-                                    {student.coachingDays?.map(d => (
-                                      <span key={d} className="text-[10px] font-bold text-slate-600 bg-slate-100 px-1.5 py-0.5 rounded uppercase">{d.slice(0, 3)}</span>
-                                    ))}
-                                  </div>
-                                  <p className="text-[10px] font-bold text-indigo-500 uppercase">{student.coachingTime || 'Time not set'}</p>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-4">
+                      {/* Responsive Card Layout for Mobile */}
+                      {students
+                        .filter(s => !selectedClassFilter || s.class === selectedClassFilter)
+                        .filter(s => !selectedBatchFilter || s.batchType === selectedBatchFilter)
+                        .map(student => (
+                          <div key={student.id} className="bg-white p-4 rounded-3xl border border-slate-100 shadow-sm sm:hidden flex flex-col gap-4">
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center gap-3">
+                                <Avatar className="h-12 w-12 border-2 border-slate-50">
+                                  <AvatarFallback className="bg-blue-50 text-blue-600 font-black text-lg">{student.name.charAt(0)}</AvatarFallback>
+                                </Avatar>
+                                <div>
+                                  <p className="font-black text-slate-900 text-base leading-tight italic">{student.name}</p>
+                                  <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-0.5">Grade {student.class} • {student.batchType} Batch</p>
                                 </div>
-                              </TableCell>
-                              <TableCell>
-                                <p className="text-sm font-black text-slate-900">₹{student.dueAmount || 0}</p>
-                                <p className="text-[9px] font-bold text-slate-400 uppercase tracking-tighter">Due Balance</p>
-                              </TableCell>
-                              <TableCell>
-                                <Badge className={`rounded-full px-3 text-[10px] font-black uppercase ${student.paymentStatus === 'paid' ? 'bg-emerald-500 shadow-lg shadow-emerald-500/20' : 'bg-red-500 shadow-lg shadow-red-500/20'}`}>
-                                  {student.paymentStatus}
-                                </Badge>
-                              </TableCell>
-                              <TableCell className="text-right pr-6">
-                                <DropdownMenu>
-                                  <DropdownMenuTrigger asChild>
-                                    <Button variant="ghost" size="sm" className="h-8 w-8 p-0 rounded-full hover:bg-slate-100">
-                                      <MoreVertical className="h-4 w-4 text-slate-400" />
-                                    </Button>
-                                  </DropdownMenuTrigger>
-                                  <DropdownMenuContent align="end" className="w-56 p-1 rounded-xl shadow-2xl border-slate-100">
-                                    <DropdownMenuLabel className="text-[9px] uppercase font-black text-slate-400 px-3 py-2 tracking-widest">Scholar Management</DropdownMenuLabel>
-                                    <DropdownMenuItem className="rounded-lg py-2.5 px-3 gap-2" onClick={() => setSelectedStudentForProfile(student)}>
-                                      <UserIcon className="w-4 h-4 text-slate-400" /> <span className="font-bold text-xs uppercase italic">Full Biography</span>
-                                    </DropdownMenuItem>
-                                    <DropdownMenuItem className="rounded-lg py-2.5 px-3 gap-2" onClick={() => handleTogglePayment(student.id)}>
-                                      <CreditCard className="w-4 h-4 text-slate-400" /> <span className="font-bold text-xs uppercase italic">{student.paymentStatus === 'paid' ? 'Mark as Due' : 'Mark as Paid'}</span>
-                                    </DropdownMenuItem>
-                                    <DropdownMenuItem className="rounded-lg py-2.5 px-3 gap-2" onClick={() => {
-                                      const text = `Hello ${student.name}, hope you are doing well. Just a quick update regarding your coaching at INFINITY BONGAON.`;
-                                      sendWhatsApp(student.whatsapp || '', text);
-                                    }}>
-                                      <MessageCircle className="w-4 h-4 text-slate-400" /> <span className="font-bold text-xs uppercase italic">Direct Dispatch</span>
-                                    </DropdownMenuItem>
-                                    <DropdownMenuItem className="rounded-lg py-2.5 px-3 gap-2" onClick={() => {
-                                      setSelectedChatGroup(`Infinity Class ${student.class}`);
-                                      setActiveTab('chats');
-                                    }}>
-                                      <GitBranch className="w-4 h-4 text-slate-400" /> <span className="font-bold text-xs uppercase italic">Join Class Chat</span>
-                                    </DropdownMenuItem>
-                                    <DropdownMenuSeparator className="my-1 mx-1 bg-slate-100" />
-                                    <DropdownMenuItem className="text-red-600 rounded-lg py-2.5 px-3 gap-2" onClick={() => {
-                                      if (confirm('Permanently remove this student?')) {
-                                        const updated = users.filter(u => u.id !== student.id);
-                                        setUsers(updated);
-                                        store.setUsers(updated);
-                                        toast.success('Student removed from database');
-                                      }
-                                    }}>
-                                      <Trash2 className="w-4 h-4" /> <span className="font-bold text-xs uppercase italic">Purge Account</span>
-                                    </DropdownMenuItem>
-                                  </DropdownMenuContent>
-                                </DropdownMenu>
-                              </TableCell>
+                              </div>
+                              <DropdownMenu>
+                                <DropdownMenuTrigger className="h-10 w-10 bg-slate-50 flex items-center justify-center rounded-2xl hover:bg-slate-100 outline-none">
+                                  <MoreVertical className="h-4 w-4 text-slate-600" />
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end" className="w-56 p-1 rounded-2xl shadow-2xl border-slate-100">
+                                  <DropdownMenuItem className="rounded-lg py-2.5 px-3 gap-2" onClick={() => setSelectedStudentForProfile(student)}>
+                                    <UserIcon className="w-4 h-4 text-slate-400" /> <span className="font-bold text-xs uppercase italic">Full Biography</span>
+                                  </DropdownMenuItem>
+                                  <DropdownMenuItem className="rounded-lg py-2.5 px-3 gap-2" onClick={() => {
+                                    const newPass = prompt(`Enter new password for ${student.name}:`, student.password);
+                                    if (newPass && newPass.length >= 4) {
+                                      const updatedUsers = users.map(u => u.id === student.id ? { ...u, password: newPass } : u);
+                                      store.setUsers(updatedUsers);
+                                      setUsers(updatedUsers);
+                                      toast.success('Password updated');
+                                    } else if (newPass) {
+                                      toast.error('Password must be at least 4 characters');
+                                    }
+                                  }}>
+                                    <Key className="w-4 h-4 text-slate-400" /> <span className="font-bold text-xs uppercase italic">Set Password</span>
+                                  </DropdownMenuItem>
+                                  <DropdownMenuItem className="rounded-lg py-2.5 px-3 gap-2" onClick={() => {
+                                    const text = `*INFINITY BONGAON*\n\nHello *${student.name}*,\nYour login details are below:\n\n*Username:* ${student.username}\n*Password:* ${student.password}\n\nLogin here: ${window.location.origin}`;
+                                    sendWhatsApp(student.whatsapp || '', text);
+                                  }}>
+                                    <MessageCircle className="w-4 h-4 text-emerald-500" /> <span className="font-bold text-xs uppercase italic text-emerald-600">Share via WhatsApp</span>
+                                  </DropdownMenuItem>
+                                  <DropdownMenuItem className="rounded-lg py-2.5 px-3 gap-2" onClick={() => handleTogglePayment(student.id)}>
+                                    <CreditCard className="w-4 h-4 text-slate-400" /> <span className="font-bold text-xs uppercase italic">{student.paymentStatus === 'paid' ? 'Mark as Due' : 'Mark as Paid'}</span>
+                                  </DropdownMenuItem>
+                                </DropdownMenuContent>
+                              </DropdownMenu>
+                            </div>
+                            <div className="grid grid-cols-2 gap-3">
+                              <div className="bg-slate-50/50 p-3 rounded-2xl border border-slate-100">
+                                <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-1 leading-none">Financials</p>
+                                <div className="flex items-center justify-between">
+                                  <p className="text-sm font-black text-slate-900 italic">₹{student.dueAmount}</p>
+                                  <Badge className={`text-[8px] h-4 leading-none uppercase ${student.paymentStatus === 'paid' ? 'bg-emerald-500' : 'bg-red-500'}`}>{student.paymentStatus}</Badge>
+                                </div>
+                              </div>
+                              <div className="bg-slate-50/50 p-3 rounded-2xl border border-slate-100">
+                                <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-1 leading-none">Class Timing</p>
+                                <p className="text-[10px] font-bold text-blue-600 truncate">{student.coachingTime || 'Not set'}</p>
+                              </div>
+                            </div>
+                          </div>
+                      ))}
+
+                    {/* Desktop Table View */}
+                    <Card className="hidden sm:block shadow-2xl border-none bg-white overflow-hidden rounded-[2rem]">
+                      <CardContent className="p-0">
+                        <Table>
+                          <TableHeader className="bg-slate-50">
+                            <TableRow className="hover:bg-transparent border-slate-200">
+                              <TableHead className="font-black text-[10px] text-slate-500 uppercase tracking-widest pl-6 py-4">Student Name</TableHead>
+                              <TableHead className="font-black text-[10px] text-slate-500 uppercase tracking-widest py-4">Schedule</TableHead>
+                              <TableHead className="font-black text-[10px] text-slate-500 uppercase tracking-widest py-4 text-center">Financials</TableHead>
+                              <TableHead className="font-black text-[10px] text-slate-500 uppercase tracking-widest py-4 text-center">Fees</TableHead>
+                              <TableHead className="font-black text-[10px] text-slate-500 uppercase tracking-widest text-right pr-6 py-4">Direct Action</TableHead>
                             </TableRow>
-                          ))}
-                        </TableBody>
-                      </Table>
-                    </CardContent>
-                  </Card>
+                          </TableHeader>
+                          <TableBody>
+                            {students
+                              .filter(s => !selectedClassFilter || s.class === selectedClassFilter)
+                              .filter(s => !selectedBatchFilter || s.batchType === selectedBatchFilter)
+                              .map(student => (
+                              <TableRow key={student.id} className="border-slate-50 hover:bg-slate-50/10 transition-colors">
+                                <TableCell className="pl-6 py-4">
+                                  <button onClick={() => setSelectedStudentForProfile(student)} className="flex items-center gap-3 text-left group">
+                                    <Avatar className="h-10 w-10 border-2 border-slate-100 group-hover:border-blue-200 transition-colors">
+                                      <AvatarFallback className="bg-blue-50 text-blue-600 font-black text-sm">{student.name.charAt(0)}</AvatarFallback>
+                                    </Avatar>
+                                    <div>
+                                      <p className="font-bold text-slate-900 text-sm group-hover:text-blue-600 transition-colors flex items-center gap-2 italic">{student.name}</p>
+                                      <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Class {student.class} • {student.batchType} Batch</p>
+                                    </div>
+                                  </button>
+                                </TableCell>
+                                <TableCell>
+                                  <div className="flex flex-col gap-1 py-1">
+                                    <div className="flex flex-wrap gap-1">
+                                      {student.coachingDays?.map(d => (
+                                        <span key={d} className="text-[10px] font-black text-slate-600 bg-slate-100 px-1.5 py-0.5 rounded-md uppercase border border-slate-200/50">{d.slice(0, 3)}</span>
+                                      ))}
+                                    </div>
+                                    <p className="text-[10px] font-black text-indigo-600 uppercase tracking-tight">{student.coachingTime || 'Time not set'}</p>
+                                  </div>
+                                </TableCell>
+                                <TableCell className="text-center italic">
+                                  <p className="text-sm font-black text-slate-900 leading-tight">₹{student.dueAmount || 0}</p>
+                                </TableCell>
+                                <TableCell className="text-center">
+                                  <Badge className={`rounded-full px-3 text-[10px] font-black uppercase ${student.paymentStatus === 'paid' ? 'bg-emerald-500' : 'bg-red-500'}`}>
+                                    {student.paymentStatus}
+                                  </Badge>
+                                </TableCell>
+                                <TableCell className="text-right pr-6">
+                                  <DropdownMenu>
+                                    <DropdownMenuTrigger className="h-8 w-8 p-0 rounded-full hover:bg-slate-100 flex items-center justify-center outline-none">
+                                      <MoreVertical className="h-4 w-4 text-slate-400" />
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent align="end" className="w-56 p-1 rounded-xl shadow-2xl border-slate-100">
+                                      <DropdownMenuItem className="rounded-lg py-2.5 px-3 gap-2" onClick={() => setSelectedStudentForProfile(student)}>
+                                        <UserIcon className="w-4 h-4 text-slate-400" /> <span className="font-bold text-xs uppercase italic">Full Biography</span>
+                                      </DropdownMenuItem>
+                                      <DropdownMenuItem className="rounded-lg py-2.5 px-3 gap-2" onClick={() => {
+                                        const newPass = prompt(`Enter new password for ${student.name}:`, student.password);
+                                        if (newPass && newPass.length >= 4) {
+                                          const updatedUsers = users.map(u => u.id === student.id ? { ...u, password: newPass } : u);
+                                          store.setUsers(updatedUsers);
+                                          setUsers(updatedUsers);
+                                          toast.success('Password updated');
+                                        } else if (newPass) {
+                                          toast.error('Password must be at least 4 characters');
+                                        }
+                                      }}>
+                                        <Key className="w-4 h-4 text-slate-400" /> <span className="font-bold text-xs uppercase italic">Set Password</span>
+                                      </DropdownMenuItem>
+                                      <DropdownMenuItem className="rounded-lg py-2.5 px-3 gap-2" onClick={() => {
+                                        const text = `*INFINITY BONGAON*\n\nHello *${student.name}*,\nYour login details are below:\n\n*Username:* ${student.username}\n*Password:* ${student.password}\n\nLogin here: ${window.location.origin}`;
+                                        sendWhatsApp(student.whatsapp || '', text);
+                                      }}>
+                                        <MessageCircle className="w-4 h-4 text-emerald-500" /> <span className="font-bold text-xs uppercase italic text-emerald-600">Share via WhatsApp</span>
+                                      </DropdownMenuItem>
+                                      <DropdownMenuItem className="rounded-lg py-2.5 px-3 gap-2" onClick={() => handleTogglePayment(student.id)}>
+                                        <CreditCard className="w-4 h-4 text-slate-400" /> <span className="font-bold text-xs uppercase italic">{student.paymentStatus === 'paid' ? 'Mark as Due' : 'Mark as Paid'}</span>
+                                      </DropdownMenuItem>
+                                    </DropdownMenuContent>
+                                  </DropdownMenu>
+                                </TableCell>
+                              </TableRow>
+                            ))}
+                          </TableBody>
+                        </Table>
+                      </CardContent>
+                    </Card>
+                    </div>
+                  </div>
                 </div>
               )}
 
@@ -878,7 +721,7 @@ export default function AdminDashboard({ user, onLogout }: AdminDashboardProps) 
                 <GeneratePaperForm onCreate={handleCreateExam} onBack={() => setActiveTab('exams')} />
               )}
 
-              {activeTab === 'chats' && <AdminChatSection initialGroup={selectedChatGroup} />}
+              {activeTab === 'chats' && <AdminChatSection initialGroup={selectedChatGroup} user={user} />}
 
               {activeTab === 'due-list' && (
                 <DueListSection students={students} onSelectStudent={setSelectedStudentForProfile} onRemind={(phone) => sendWhatsApp(phone, "Dear Student, this is a reminder regarding your pending fees at Rupak Math Academy. Please clear it at the earliest.")} />
@@ -887,7 +730,6 @@ export default function AdminDashboard({ user, onLogout }: AdminDashboardProps) 
               {activeTab === 'receive' && (
                 <ReceivePaymentSection 
                   students={students} 
-                  onSelectStudent={setSelectedStudentForProfile}
                   onTogglePayment={handleTogglePayment} 
                   onWhatsApp={(phone) => sendWhatsApp(phone, "Hello! Your payment has been received at Rupak Math Academy. Thank you!")}
                 />
@@ -898,7 +740,9 @@ export default function AdminDashboard({ user, onLogout }: AdminDashboardProps) 
                   const updated = [...notes, n];
                   store.setNotes(updated);
                   setNotes(updated);
-                  toast.success('Note added successfully');
+                }} onUpdate={(updated) => {
+                  store.setNotes(updated);
+                  setNotes(updated);
                 }} />
               )}
 
@@ -943,7 +787,17 @@ export default function AdminDashboard({ user, onLogout }: AdminDashboardProps) 
               )}
 
               {activeTab === 'results' && (
-                <ResultsSection results={results} />
+                <ResultsSection 
+                  results={results} 
+                  exams={exams} 
+                  students={students} 
+                  onUpdateExam={(exam) => {
+                    const updated = exams.map(e => e.id === exam.id ? exam : e);
+                    setExams(updated);
+                    store.setExams(updated);
+                    toast.success(exam.resultsPublished ? 'Results published' : 'Results hidden');
+                  }}
+                />
               )}
 
               {activeTab === 'attendance' && (
@@ -954,8 +808,22 @@ export default function AdminDashboard({ user, onLogout }: AdminDashboardProps) 
                 }} />
               )}
 
+              {activeTab === 'growth' && (
+                <GrowthSection students={students} payments={payments} />
+              )}
+
+              {activeTab === 'timetable' && (
+                <TimetableSection 
+                  timetable={timetable} 
+                  onUpdate={(updated) => {
+                    store.setTimetable(updated);
+                    setTimetable(updated);
+                  }} 
+                />
+              )}
+
               {activeTab === 'settings' && (
-                <SettingsSection user={user} students={students} onUpdateUser={(updatedUser) => {
+                <SettingsSection user={user} students={students} onUpdateUser={(updatedUser: User) => {
                   const allUsers = store.getUsers();
                   const updatedUsers = allUsers.map(u => u.id === updatedUser.id ? updatedUser : u);
                   store.setUsers(updatedUsers);
@@ -963,11 +831,9 @@ export default function AdminDashboard({ user, onLogout }: AdminDashboardProps) 
                   toast.success('Settings updated');
                 }} />
               )}
-            </div>
-        </ScrollArea>
       </main>
 
-      {selectedStudentForProfile && (
+        {selectedStudentForProfile && (
         <Dialog open={!!selectedStudentForProfile} onOpenChange={() => setSelectedStudentForProfile(null)}>
           <DialogContent className="max-w-md bg-white p-0 overflow-hidden border-none shadow-2xl rounded-3xl">
             <div className={`h-24 w-full ${selectedStudentForProfile.batchType === 'Sr' ? 'bg-amber-500' : 'bg-blue-600'} relative`}>
@@ -1028,23 +894,67 @@ export default function AdminDashboard({ user, onLogout }: AdminDashboardProps) 
           </DialogContent>
         </Dialog>
       )}
+
+      {/* Mobile Bar Navigation */}
+      <div className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-slate-900 border-t border-white/10 px-6 py-2 pb-safe shadow-[0_-10px_40px_rgba(0,0,0,0.3)] flex items-center justify-between">
+        <button 
+          onClick={() => setActiveTab('overview')}
+          className={`flex flex-col items-center justify-center gap-1 transition-all ${activeTab === 'overview' ? 'text-blue-400' : 'text-slate-400'}`}
+        >
+          <LayoutDashboard className="w-6 h-6" />
+          <span className="text-[8px] font-black uppercase tracking-widest leading-none">Dash</span>
+        </button>
+        
+        <button 
+          onClick={() => setActiveTab('students')}
+          className={`flex flex-col items-center justify-center gap-1 transition-all ${activeTab === 'students' ? 'text-blue-400' : 'text-slate-400'}`}
+        >
+          <Users className="w-6 h-6" />
+          <span className="text-[8px] font-black uppercase tracking-widest leading-none">Scholars</span>
+        </button>
+
+        <div className="relative -mt-8">
+          <button 
+            onClick={() => setIsActionsOpen(true)}
+            className="w-14 h-14 bg-blue-600 rounded-full flex items-center justify-center shadow-xl shadow-blue-600/30 border-4 border-slate-900 active:scale-90 transition-transform"
+          >
+            <Plus className="w-7 h-7 text-white" />
+          </button>
+        </div>
+
+        <button 
+          onClick={() => setActiveTab('chats')}
+          className={`flex flex-col items-center justify-center gap-1 transition-all ${activeTab === 'chats' ? 'text-blue-400' : 'text-slate-400'}`}
+        >
+          <MessageCircle className="w-6 h-6" />
+          <span className="text-[8px] font-black uppercase tracking-widest leading-none">Chat</span>
+        </button>
+
+        <button 
+          onClick={() => setIsActionsOpen(true)}
+          className="flex flex-col items-center justify-center gap-1 transition-all text-slate-400"
+        >
+          <MoreVertical className="w-6 h-6" />
+          <span className="text-[8px] font-black uppercase tracking-widest leading-none">More</span>
+        </button>
+      </div>
     </div>
   );
 }
 
 function StatCard({ title, value, icon, trend }: { title: string, value: string | number, icon: React.ReactNode, trend: string }) {
   return (
-    <Card className="overflow-hidden border-0 shadow-lg hover:shadow-xl transition-shadow">
+    <Card className="overflow-hidden border-0 shadow-lg hover:shadow-xl transition-shadow bg-white rounded-2xl">
       <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-        <CardTitle className="text-sm font-medium text-slate-500">{title}</CardTitle>
+        <CardTitle className="text-[10px] font-black uppercase text-slate-400 tracking-widest">{title}</CardTitle>
         <div className="p-2 bg-indigo-50 rounded-lg text-indigo-600">
           {icon}
         </div>
       </CardHeader>
       <CardContent>
         <div className="text-2xl font-bold">{value}</div>
-        <p className="text-xs text-green-600 mt-1 font-medium flex items-center gap-1">
-          {trend}
+        <p className="text-[10px] text-green-600 mt-1 font-medium flex items-center gap-1 uppercase">
+          <TrendingUp className="w-3 h-3" /> {trend}
         </p>
       </CardContent>
     </Card>
@@ -1186,38 +1096,88 @@ function SettingsSection({ user, students, onUpdateUser }: { user: User, student
         <div className="h-2 bg-blue-600" />
         <CardHeader>
           <CardTitle className="text-xl font-black uppercase italic tracking-tight">Student Credentials</CardTitle>
-          <CardDescription>View and manage portal access</CardDescription>
+          <CardDescription>View and manage portal access for individual scholars</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="space-y-4">
+          <div className="space-y-6">
             <div className="space-y-2">
-              <Label className="text-[10px] font-black uppercase text-slate-400">Select Scholar</Label>
+              <Label className="text-[10px] font-black uppercase text-slate-400">Search & Select Scholar</Label>
               <Select onValueChange={(id) => setSelectedStudent(students.find(s => s.id === id) || null)}>
-                <SelectTrigger className="h-11"><SelectValue placeholder="Select a student" /></SelectTrigger>
-                <SelectContent>
-                  {students.map(s => <SelectItem key={s.id} value={s.id}>{s.name} (Class {s.class})</SelectItem>)}
+                <SelectTrigger className="h-12 rounded-2xl border-slate-200">
+                  <SelectValue placeholder="Select a student" />
+                </SelectTrigger>
+                <SelectContent className="max-h-80">
+                  {students.sort((a, b) => a.name.localeCompare(b.name)).map(s => (
+                    <SelectItem key={s.id} value={s.id}>
+                      {s.name} (Class {s.class})
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
             
-            {selectedStudent && (
-              <div className="p-6 bg-slate-50 rounded-3xl border border-slate-100 space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-1">
-                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Username</p>
-                    <p className="text-sm font-black text-slate-900 italic">{selectedStudent.username}</p>
+            {selectedStudent ? (
+              <div className="p-4 sm:p-6 bg-slate-50 rounded-3xl border border-slate-100 space-y-6">
+                <div className="flex items-center gap-3">
+                  <Avatar className="h-12 w-12 border-2 border-white shadow-sm">
+                    <AvatarFallback className="bg-blue-600 text-white font-black">{selectedStudent.name.charAt(0)}</AvatarFallback>
+                  </Avatar>
+                  <div>
+                    <p className="font-black text-slate-900 text-sm leading-none uppercase italic">{selectedStudent.name}</p>
+                    <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-1">Class {selectedStudent.class} • {selectedStudent.batchType}</p>
                   </div>
-                  <div className="space-y-1">
-                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Login Key</p>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="p-4 bg-white rounded-2xl border border-slate-200 shadow-sm space-y-1">
+                    <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest leading-none">Username</p>
+                    <p className="text-sm font-black text-slate-900 italic break-all">{selectedStudent.username}</p>
+                  </div>
+                  <div className="p-4 bg-white rounded-2xl border border-slate-200 shadow-sm space-y-1">
+                    <div className="flex justify-between items-center">
+                      <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest leading-none">Login Password</p>
+                      <button 
+                        onClick={() => {
+                          const newPass = prompt(`Setting new password for ${selectedStudent.name}:`, selectedStudent.password);
+                          if (newPass && newPass.length >= 4) {
+                            const updatedUsers = students.map(u => u.id === selectedStudent.id ? { ...u, password: newPass } : u);
+                            store.setUsers(updatedUsers);
+                            onUpdateUser({ ...user }); // Force state refresh in parent indirectly via this callback if needed or rely on store
+                            setSelectedStudent({ ...selectedStudent, password: newPass });
+                            toast.success('Password updated');
+                          }
+                        }}
+                        className="text-[9px] font-black text-blue-600 uppercase hover:underline"
+                      >
+                        Change
+                      </button>
+                    </div>
                     <p className="text-sm font-black text-indigo-600 italic tracking-tighter">{selectedStudent.password}</p>
                   </div>
                 </div>
-                <Button className="w-full bg-white border border-slate-200 text-slate-900 h-11 hover:bg-slate-100 font-bold" onClick={() => {
-                  const text = `Hello ${selectedStudent.name}, your Rupak Math Portal login details:\nUsername: ${selectedStudent.username}\nPassword: ${selectedStudent.password}`;
-                  window.open(`https://wa.me/${selectedStudent.whatsapp}?text=${encodeURIComponent(text)}`);
-                }}>
-                  <MessageCircle className="w-4 h-4 mr-2" /> Share via WhatsApp
-                </Button>
+
+                <div className="space-y-2">
+                  <Button 
+                    className="w-full bg-emerald-600 hover:bg-emerald-700 text-white h-12 rounded-2xl font-black uppercase tracking-widest italic shadow-lg shadow-emerald-600/20" 
+                    onClick={() => {
+                      const text = `*INFINITY BONGAON*\n\nHello *${selectedStudent.name}*,\nYour login details are below:\n\n*Username:* ${selectedStudent.username}\n*Password:* ${selectedStudent.password}\n\nLogin here: ${window.location.origin}`;
+                      window.open(`https://wa.me/${selectedStudent.whatsapp}?text=${encodeURIComponent(text)}`);
+                    }}
+                  >
+                    <MessageCircle className="w-5 h-5 mr-2" /> Share via WhatsApp
+                  </Button>
+                  <p className="text-center text-[9px] text-slate-400 font-bold uppercase tracking-tighter">Credentials will be sent to +${selectedStudent.whatsapp}</p>
+                </div>
+              </div>
+            ) : (
+              <div className="py-20 flex flex-col items-center justify-center text-center space-y-3 bg-slate-50/50 rounded-3xl border border-dashed border-slate-200">
+                <div className="p-3 bg-white rounded-full shadow-sm">
+                  <Key className="w-6 h-6 text-slate-300" />
+                </div>
+                <div className="px-6">
+                  <p className="text-xs font-black text-slate-600 uppercase italic">No Scholar Selected</p>
+                  <p className="text-[10px] text-slate-400 font-bold mt-1">Select a student from the dropdown above to manage their portal credentials</p>
+                </div>
               </div>
             )}
           </div>
@@ -1227,22 +1187,24 @@ function SettingsSection({ user, students, onUpdateUser }: { user: User, student
   );
 }
 
-function SidebarItem({ icon, label, active, onClick }: { icon: React.ReactNode, label: string, active?: boolean, onClick: () => void }) {
+function SidebarItem() { return null; }
+
+function AppGridItem({ icon, label, onClick }: { icon: React.ReactNode, label: string, onClick: () => void }) {
   return (
     <button
       onClick={onClick}
-      className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
-        active ? 'bg-indigo-800 text-white' : 'text-indigo-300 hover:bg-indigo-800/50 hover:text-white'
-      }`}
+      className="p-4 bg-white/5 hover:bg-white/10 rounded-2xl border border-white/5 transition-all text-center group cursor-pointer"
     >
-      {icon}
-      <span className="font-medium">{label}</span>
+      <div className="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center mb-2 mx-auto group-hover:scale-110 group-hover:bg-blue-600 transition-all">
+        {React.cloneElement(icon as React.ReactElement<any>, { size: 20 })}
+      </div>
+      <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 group-hover:text-white">{label}</p>
     </button>
   );
 }
 
 function AddStudentForm({ user, users, setUsers, onAdd, onBack, students }: { user: User, users: User[], setUsers: (u: User[]) => void, onAdd: (s: Partial<User>) => void, onBack: () => void, students: User[] }) {
-  const [formData, setFormData] = useState({ 
+  const [formData, setFormData] = useState<Partial<User>>({ 
     name: '', 
     username: '', 
     password: '1234', 
@@ -1620,14 +1582,15 @@ function GeneratePaperForm({ onCreate, onBack }: { onCreate: (e: Exam) => void, 
   );
 }
 
-function AdminChatSection({ initialGroup }: { initialGroup?: string | null }) {
+function AdminChatSection({ initialGroup, user }: { initialGroup?: string | null, user: User }) {
   const [selectedGroup, setSelectedGroup] = useState<string | null>(initialGroup || null);
-  const [groups, setGroups] = useState(['Global Chat', 'Infinity Class 5', 'Infinity Class 6', 'Infinity Class 7', 'Infinity Class 8', 'Infinity Class 9', 'Infinity Class 10', 'Infinity Class 11', 'Infinity Class 12']);
+  const [groups, setGroups] = useState<string[]>([]);
   const [newMessage, setNewMessage] = useState('');
   const [messages, setMessages] = useState<Message[]>([]);
 
   useEffect(() => {
     setMessages(store.getMessages());
+    setGroups(store.getChatGroups());
   }, []);
 
   useEffect(() => {
@@ -1663,7 +1626,9 @@ function AdminChatSection({ initialGroup }: { initialGroup?: string | null }) {
       const baseName = selectedGroup.split('(')[0].trim();
       const timeGroup = `${baseName} (${time})`;
       if (!groups.includes(timeGroup)) {
-        setGroups([...groups, timeGroup]);
+        const updatedGroups = [...groups, timeGroup];
+        setGroups(updatedGroups);
+        store.setChatGroups(updatedGroups);
         setSelectedGroup(timeGroup);
         toast.success(`Timing group ${timeGroup} created`);
       } else {
@@ -1681,9 +1646,29 @@ function AdminChatSection({ initialGroup }: { initialGroup?: string | null }) {
     const nextBranch = `${baseName}(${suffix})`;
     
     if (!groups.includes(nextBranch)) {
-      setGroups([...groups, nextBranch]);
+      const updatedGroups = [...groups, nextBranch];
+      setGroups(updatedGroups);
+      store.setChatGroups(updatedGroups);
       setSelectedGroup(nextBranch);
       toast.success(`Created branch ${nextBranch}`);
+    }
+  };
+
+  const handleRenameGroup = (oldName: string) => {
+    const newName = prompt('Rename class group:', oldName);
+    if (newName && newName.trim() !== oldName) {
+      const updatedGroups = groups.map(g => g === oldName ? newName : g);
+      setGroups(updatedGroups);
+      store.setChatGroups(updatedGroups);
+      if (selectedGroup === oldName) setSelectedGroup(newName);
+      
+      // Update all messages in this group
+      const allMsgs = store.getMessages();
+      const updatedMsgs = allMsgs.map(m => m.classId === oldName ? { ...m, classId: newName } : m);
+      store.setMessages(updatedMsgs);
+      setMessages(updatedMsgs);
+      
+      toast.success('Group renamed successfully');
     }
   };
 
@@ -1707,19 +1692,33 @@ function AdminChatSection({ initialGroup }: { initialGroup?: string | null }) {
         </div>
         <ScrollArea className="flex-1">
           {groups.map(group => (
-            <button 
-              key={group} 
-              onClick={() => setSelectedGroup(group)}
-              className={`w-full p-4 flex items-center gap-3 transition-all border-b border-slate-50 ${selectedGroup === group ? 'bg-white border-r-4 border-r-blue-600 shadow-sm' : 'hover:bg-slate-100'}`}
-            >
-              <div className={`p-2 rounded-xl text-white ${group.includes('Global') ? 'bg-indigo-600' : 'bg-blue-600'}`}>
-                <Users2 className="w-5 h-5" />
-              </div>
-              <div className="text-left overflow-hidden">
-                <p className={`text-sm font-bold truncate ${selectedGroup === group ? 'text-blue-600' : 'text-slate-900'}`}>{group}</p>
-                <p className="text-[10px] text-slate-500 font-medium truncate uppercase tracking-widest">Active Group</p>
-              </div>
-            </button>
+            <div key={group} className="relative group/group shadow-sm">
+              <button 
+                onClick={() => setSelectedGroup(group)}
+                className={`w-full p-4 flex items-center gap-3 transition-all border-b border-slate-50 ${selectedGroup === group ? 'bg-white border-r-4 border-r-blue-600 shadow-sm' : 'hover:bg-slate-100'}`}
+              >
+                <div className={`p-2 rounded-xl text-white ${group.includes('Global') ? 'bg-indigo-600' : 'bg-blue-600'}`}>
+                  <Users2 className="w-5 h-5" />
+                </div>
+                <div className="text-left overflow-hidden">
+                  <p className={`text-sm font-bold truncate ${selectedGroup === group ? 'text-blue-600' : 'text-slate-900'}`}>{group}</p>
+                  <p className="text-[10px] text-slate-500 font-medium truncate uppercase tracking-widest">Active Group</p>
+                </div>
+              </button>
+              {user.role === 'admin' && (
+                <Button 
+                  variant="ghost" 
+                  size="icon" 
+                  className="absolute right-2 top-1/2 -translate-y-1/2 h-7 w-7 opacity-0 group-hover/group:opacity-100 transition-opacity bg-white/80 backdrop-blur shadow-sm rounded-full"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleRenameGroup(group);
+                  }}
+                >
+                  <Edit2 className="w-3 h-3 text-slate-400" />
+                </Button>
+              )}
+            </div>
           ))}
         </ScrollArea>
       </div>
@@ -1736,8 +1735,20 @@ function AdminChatSection({ initialGroup }: { initialGroup?: string | null }) {
                 <div className={`p-2 rounded-xl text-white ${selectedGroup.includes('Global') ? 'bg-indigo-600' : 'bg-blue-600'}`}>
                   <Users2 className="w-5 h-5" />
                 </div>
-                <div>
-                  <p className="font-black text-slate-900 uppercase italic tracking-tight">{selectedGroup}</p>
+                <div className="flex flex-col">
+                  <div className="flex items-center gap-2">
+                    <p className="font-black text-slate-900 uppercase italic tracking-tight">{selectedGroup}</p>
+                    {user.role === 'admin' && (
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        className="h-6 w-6 rounded-full hover:bg-slate-200"
+                        onClick={() => handleRenameGroup(selectedGroup)}
+                      >
+                        <Edit2 className="w-3 h-3 text-slate-400" />
+                      </Button>
+                    )}
+                  </div>
                   <p className="text-[10px] text-emerald-500 font-bold uppercase tracking-widest flex items-center gap-1">
                     <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse" /> Live Now
                   </p>
@@ -1832,132 +1843,209 @@ function DueListSection({ students, onRemind, onSelectStudent }: { students: Use
   const isAfter15th = today.getDate() >= 15;
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Due List</CardTitle>
-        <CardDescription>
-          {isAfter15th ? 'Showing students with pending dues after 15th' : 'Monthly due list (Updates on 15th)'}
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Student Name</TableHead>
-              <TableHead>Class</TableHead>
-              <TableHead>WhatsApp</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Action</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {dueStudents.map(s => (
-              <TableRow key={s.id}>
-                <TableCell className="font-medium">{s.name}</TableCell>
-                <TableCell>Class {s.class}</TableCell>
-                <TableCell>{s.whatsapp}</TableCell>
-                <TableCell><Badge variant="destructive">Unpaid</Badge></TableCell>
-                <TableCell className="text-right">
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="icon" className="h-8 w-8">
-                        <MoreVertical className="h-4 w-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="w-48 p-1">
-                      <DropdownMenuItem className="gap-2" onClick={() => onRemind(s.whatsapp)}>
-                        <MessageSquare className="w-4 h-4 text-green-600" /> <span>Send Reminder</span>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem className="gap-2" onClick={() => onSelectStudent(s)}>
-                        <UserIcon className="w-4 h-4 text-blue-600" /> <span>View Details</span>
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </TableCell>
-              </TableRow>
-            ))}
-            {dueStudents.length === 0 && <TableRow><TableCell colSpan={5} className="text-center text-slate-400 py-10">All students have paid!</TableCell></TableRow>}
-          </TableBody>
-        </Table>
-      </CardContent>
-    </Card>
+    <div className="space-y-4">
+      <Card className="border-none shadow-2xl rounded-[1.5rem] sm:rounded-[2rem] overflow-hidden bg-white">
+        <CardHeader className="bg-slate-900 text-white p-5 sm:p-8">
+          <div className="flex justify-between items-center">
+            <div>
+              <CardTitle className="text-xl sm:text-2xl font-black uppercase italic tracking-tighter shadow-sm">Due List Analytics</CardTitle>
+              <CardDescription className="text-slate-400 text-[10px] font-bold uppercase tracking-widest mt-1">
+                {isAfter15th ? 'Showing critical pending dues (After 15th)' : 'Active Monthly Dues'}
+              </CardDescription>
+            </div>
+            <div className="h-10 w-10 sm:h-12 sm:w-12 bg-white/10 rounded-2xl flex items-center justify-center">
+              <Bell className="w-5 h-5 sm:w-6 sm:h-6 text-orange-400" />
+            </div>
+          </div>
+        </CardHeader>
+        
+        {/* Mobile Friendly Card View */}
+        <div className="p-3 bg-slate-50/50 space-y-3 sm:hidden">
+          {dueStudents.map(s => (
+            <div key={s.id} className="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm flex flex-col gap-3">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="font-black text-slate-900 text-sm italic">{s.name}</p>
+                  <p className="text-[9px] text-slate-400 font-bold uppercase tracking-widest">Class {s.class} Scholar</p>
+                </div>
+                <Badge className="bg-red-500 text-[9px] font-black h-4 px-2">UNPAID</Badge>
+              </div>
+              <div className="flex items-center justify-between pt-3 border-t border-slate-50">
+                <p className="text-[10px] font-bold text-slate-500 tabular-nums">{s.whatsapp}</p>
+                <div className="flex gap-2">
+                   <Button size="sm" variant="ghost" className="h-8 w-8 p-0 rounded-full bg-slate-50" onClick={() => onSelectStudent(s)}>
+                    <UserIcon className="w-3.5 h-3.5 text-blue-500" />
+                  </Button>
+                  <Button size="sm" variant="ghost" className="h-8 w-8 p-0 rounded-full bg-slate-50" onClick={() => onRemind(s.whatsapp)}>
+                    <MessageSquare className="w-3.5 h-3.5 text-emerald-500" />
+                  </Button>
+                </div>
+              </div>
+            </div>
+          ))}
+          {dueStudents.length === 0 && (
+            <div className="py-20 text-center">
+              <CheckCircle2 className="w-12 h-12 text-emerald-500 mx-auto mb-4" />
+              <p className="font-black text-slate-400 uppercase italic text-xs">All Clear!</p>
+            </div>
+          )}
+        </div>
+
+        {/* Desktop Table View */}
+        <div className="p-0 hidden sm:block overflow-x-auto scrollbar-hide">
+          <div className="min-w-[700px] lg:min-w-full">
+            <Table>
+              <TableHeader className="bg-slate-50/50">
+                <TableRow className="border-slate-100">
+                  <TableHead className="font-black text-[10px] uppercase pl-6 py-4">Student Name</TableHead>
+                  <TableHead className="font-black text-[10px] uppercase">Class</TableHead>
+                  <TableHead className="font-black text-[10px] uppercase">Contact</TableHead>
+                  <TableHead className="font-black text-[10px] uppercase text-center">Status</TableHead>
+                  <TableHead className="font-black text-[10px] uppercase text-right pr-6">Action</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {dueStudents.map(s => (
+                  <TableRow key={s.id} className="hover:bg-slate-50/50 transition-colors border-slate-50">
+                    <TableCell className="font-bold text-slate-800 text-sm pl-6">{s.name}</TableCell>
+                    <TableCell>
+                      <Badge variant="outline" className="text-[10px] font-black h-5 border-slate-200">Class {s.class}</Badge>
+                    </TableCell>
+                    <TableCell className="text-[10px] font-bold text-slate-500 font-mono tracking-tighter">{s.whatsapp}</TableCell>
+                    <TableCell className="text-center">
+                      <Badge className="bg-red-500 text-[10px] font-black h-5 italic tracking-tighter">UNPAID</Badge>
+                    </TableCell>
+                    <TableCell className="text-right pr-6">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger className={cn(buttonVariants({ variant: "ghost", size: "sm" }), "h-9 w-9 rounded-xl hover:bg-slate-100 flex items-center justify-center")}>
+                          <MoreVertical className="h-4 w-4 text-slate-400" />
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="w-56 p-1 rounded-xl shadow-2xl border-slate-100">
+                          <DropdownMenuLabel className="text-[9px] font-black uppercase text-slate-400 px-3 py-2 tracking-widest">Finance Management</DropdownMenuLabel>
+                          <DropdownMenuItem className="gap-3 py-2.5 rounded-lg" onClick={() => onRemind(s.whatsapp)}>
+                            <MessageSquare className="w-4 h-4 text-emerald-500" /> <span className="font-bold text-xs uppercase italic">Send Reminder</span>
+                          </DropdownMenuItem>
+                          <DropdownMenuItem className="gap-3 py-2.5 rounded-lg" onClick={() => onSelectStudent(s)}>
+                            <UserIcon className="w-4 h-4 text-blue-500" /> <span className="font-bold text-xs uppercase italic">View Biography</span>
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </TableCell>
+                  </TableRow>
+                ))}
+                {dueStudents.length === 0 && (
+                  <TableRow>
+                    <TableHead colSpan={5} className="text-center py-20">
+                      <div className="flex flex-col items-center">
+                        <div className="h-16 w-16 bg-emerald-50 text-emerald-500 rounded-full flex items-center justify-center mb-4">
+                          <CheckCircle2 className="w-8 h-8" />
+                        </div>
+                        <p className="font-black text-slate-400 uppercase italic tracking-widest text-sm">All students have cleared dues!</p>
+                      </div>
+                    </TableHead>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </div>
+        </div>
+      </Card>
+    </div>
   );
 }
 
-function ReceivePaymentSection({ students, onTogglePayment, onWhatsApp, onSelectStudent }: { students: User[], onTogglePayment: (id: string) => void, onWhatsApp: (phone: string) => void, onSelectStudent: (u: User) => void }) {
+function ReceivePaymentSection({ students, onTogglePayment, onWhatsApp }: { students: User[], onTogglePayment: (id: string) => void, onWhatsApp: (phone: string) => void }) {
   const [search, setSearch] = useState('');
-  const filtered = students.filter(s => s.name.toLowerCase().includes(search.toLowerCase()));
+  const [filter, setFilter] = useState<'all' | 'paid' | 'due'>('due');
+
+  const filtered = students.filter(s => {
+    const matchesSearch = s.name.toLowerCase().includes(search.toLowerCase()) || 
+                         s.username.toLowerCase().includes(search.toLowerCase());
+    const matchesFilter = filter === 'all' || s.paymentStatus === filter;
+    return matchesSearch && matchesFilter;
+  });
 
   return (
     <Card>
       <CardHeader>
-        <div className="flex justify-between items-center">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
             <CardTitle>Receive Payment</CardTitle>
-            <CardDescription>Mark student payments by ticking their name</CardDescription>
+            <CardDescription>Update student fee status</CardDescription>
           </div>
-          <div className="relative w-64">
-            <Search className="absolute left-2 top-2.5 h-4 w-4 text-slate-400" />
-            <Input placeholder="Search student..." className="pl-8" value={search} onChange={e => setSearch(e.target.value)} />
+          <div className="flex bg-slate-100 p-1 rounded-lg">
+            {(['all', 'paid', 'due'] as const).map((f) => (
+              <button
+                key={f}
+                onClick={() => setFilter(f)}
+                className={cn(
+                  "px-3 py-1.5 rounded-md text-xs font-bold transition-all",
+                  filter === f ? "bg-white text-indigo-600 shadow-sm" : "text-slate-500 hover:text-slate-700"
+                )}
+              >
+                {f.charAt(0).toUpperCase() + f.slice(1)}
+              </button>
+            ))}
           </div>
         </div>
       </CardHeader>
-      <CardContent>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead className="w-12">Tick</TableHead>
-              <TableHead>Student Name</TableHead>
-              <TableHead>Class</TableHead>
-              <TableHead>Current Status</TableHead>
-              <TableHead>Action</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {filtered.map(s => (
-              <TableRow key={s.id}>
-                <TableCell>
-                  <Checkbox checked={s.paymentStatus === 'paid'} onCheckedChange={() => onTogglePayment(s.id)} />
-                </TableCell>
-                <TableCell className="font-medium">{s.name}</TableCell>
-                <TableCell>Class {s.class}</TableCell>
-                <TableCell>
-                  <Badge variant={s.paymentStatus === 'paid' ? 'default' : 'destructive'}>
+      <CardContent className="space-y-4">
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+          <Input 
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            placeholder="Search student..."
+            className="pl-10"
+          />
+        </div>
+
+        <div className="space-y-3">
+          {filtered.map(s => (
+            <div key={s.id} className="flex items-center justify-between p-4 bg-slate-50 rounded-xl hover:bg-slate-100 transition-colors">
+              <div className="flex items-center gap-3">
+                <Avatar className="h-10 w-10">
+                  <AvatarFallback className="bg-white text-slate-900 font-bold">{s.name.charAt(0)}</AvatarFallback>
+                </Avatar>
+                <div>
+                  <p className="font-bold text-sm">{s.name}</p>
+                  <p className="text-[10px] text-slate-500">Class {s.class} • ID: {s.username}</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="text-right mr-4 hidden sm:block">
+                  <p className="text-[10px] font-bold text-slate-400 uppercase">Status</p>
+                  <Badge variant={s.paymentStatus === 'paid' ? 'default' : 'destructive'} className="text-[10px] h-5">
                     {s.paymentStatus}
                   </Badge>
-                </TableCell>
-                <TableCell className="text-right">
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="icon" className="h-8 w-8">
-                        <MoreVertical className="h-4 w-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="w-48 p-1">
-                      <DropdownMenuItem className="gap-2" onClick={() => onTogglePayment(s.id)}>
-                        <CheckCircle2 className={`w-4 h-4 ${s.paymentStatus === 'paid' ? 'text-red-500' : 'text-emerald-500'}`} /> 
-                        <span>{s.paymentStatus === 'paid' ? 'Mark as Unpaid' : 'Mark as Paid'}</span>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem className="gap-2" onClick={() => onWhatsApp(s.whatsapp)}>
-                        <MessageSquare className="w-4 h-4 text-green-600" /> <span>WhatsApp Receipt</span>
-                      </DropdownMenuItem>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem className="gap-2" onClick={() => onSelectStudent(s)}>
-                        <UserIcon className="w-4 h-4 text-blue-600" /> <span>Student Biography</span>
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+                </div>
+                <Button 
+                  size="sm" 
+                  variant={s.paymentStatus === 'paid' ? 'outline' : 'default'}
+                  onClick={() => onTogglePayment(s.id)}
+                  className="font-bold text-[10px] uppercase tracking-widest"
+                >
+                  {s.paymentStatus === 'paid' ? 'Mark Due' : 'Mark Paid'}
+                </Button>
+                <Button variant="ghost" size="icon" onClick={() => onWhatsApp(s.whatsapp)} className="text-green-600">
+                  <Send className="w-4 h-4" />
+                </Button>
+              </div>
+            </div>
+          ))}
+          {filtered.length === 0 && <p className="text-center text-slate-400 py-10">No students found</p>}
+        </div>
       </CardContent>
     </Card>
   );
 }
 
-function NotesSection({ user, notes, onAdd }: { user: User, notes: Note[], onAdd: (n: Note) => void }) {
+function NotesSection({ user, notes, onAdd, onUpdate }: { 
+  user: User, 
+  notes: Note[], 
+  onAdd: (n: Note) => void,
+  onUpdate: (notes: Note[]) => void
+}) {
   const [title, setTitle] = useState('');
   const [classId, setClassId] = useState('10');
   const [content, setContent] = useState('');
@@ -1973,6 +2061,7 @@ function NotesSection({ user, notes, onAdd }: { user: User, notes: Note[], onAdd
       content: noteType === 'text' ? content : 'File attached',
       type: noteType,
       fileUrl: noteType === 'file' ? fileUrl : undefined,
+      isPublished: true, // New notes are published by default
       createdAt: Date.now()
     };
     onAdd(note);
@@ -1982,35 +2071,42 @@ function NotesSection({ user, notes, onAdd }: { user: User, notes: Note[], onAdd
     toast.success('Note published successfully');
   };
 
+  const togglePublished = (noteId: string) => {
+    const updated = notes.map(n => n.id === noteId ? { ...n, isPublished: !n.isPublished } : n);
+    onUpdate(updated);
+    const note = updated.find(n => n.id === noteId);
+    toast.success(note?.isPublished ? 'Note published to students' : 'Note hidden from students');
+  };
+
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-      <Card className="shadow-xl border-white/40 bg-white/80 backdrop-blur-md">
+      <Card className="shadow-xl border-white/40 bg-white/80 backdrop-blur-md rounded-[2rem]">
         <CardHeader>
-          <CardTitle className="text-xl font-black tracking-tight">Create Study Material</CardTitle>
-          <CardDescription>Share notes or files with your students</CardDescription>
+          <CardTitle className="text-xl font-black tracking-tight uppercase italic text-slate-900 leading-none">Create Study Material</CardTitle>
+          <CardDescription className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Share notes or files with your students</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-2">
-              <Label className="font-bold">Note Title</Label>
-              <Input value={title} onChange={e => setTitle(e.target.value)} placeholder="e.g. Trigonometry Basics" required className="h-12" />
+              <Label className="text-[10px] font-black uppercase text-slate-400">Note Title</Label>
+              <Input value={title} onChange={e => setTitle(e.target.value)} placeholder="e.g. Trigonometry Basics" required className="h-12 rounded-xl" />
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label className="font-bold">Target Class</Label>
+                <Label className="text-[10px] font-black uppercase text-slate-400">Target Class</Label>
                 <Select value={classId} onValueChange={setClassId}>
-                  <SelectTrigger className="h-12"><SelectValue /></SelectTrigger>
+                  <SelectTrigger className="h-12 rounded-xl"><SelectValue /></SelectTrigger>
                   <SelectContent>
                     {['5', '6', '7', '8', '9', '10', '11', '12'].map(c => <SelectItem key={c} value={c}>Class {c}</SelectItem>)}
                   </SelectContent>
                 </Select>
               </div>
               <div className="space-y-2">
-                <Label className="font-bold">Submission Type</Label>
+                <Label className="text-[10px] font-black uppercase text-slate-400">Submission Type</Label>
                 <Tabs value={noteType} onValueChange={(v) => setNoteType(v as 'text' | 'file')} className="w-full">
-                  <TabsList className="grid w-full grid-cols-2 h-12">
-                    <TabsTrigger value="text" className="font-bold">Write Note</TabsTrigger>
-                    <TabsTrigger value="file" className="font-bold">Add File</TabsTrigger>
+                  <TabsList className="grid w-full grid-cols-2 h-12 rounded-xl bg-slate-100/50 p-1">
+                    <TabsTrigger value="text" className="font-bold rounded-lg text-xs">Write</TabsTrigger>
+                    <TabsTrigger value="file" className="font-bold rounded-lg text-xs">File</TabsTrigger>
                   </TabsList>
                 </Tabs>
               </div>
@@ -2018,9 +2114,9 @@ function NotesSection({ user, notes, onAdd }: { user: User, notes: Note[], onAdd
 
             {noteType === 'text' ? (
               <div className="space-y-2">
-                <Label className="font-bold">Content</Label>
+                <Label className="text-[10px] font-black uppercase text-slate-400">Content</Label>
                 <textarea 
-                  className="w-full min-h-[200px] p-4 rounded-xl border border-slate-200 bg-white text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all"
+                  className="w-full min-h-[200px] p-4 rounded-xl border border-slate-200 bg-white text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all resize-none"
                   placeholder="Write your study notes here..."
                   value={content}
                   onChange={e => setContent(e.target.value)}
@@ -2029,90 +2125,75 @@ function NotesSection({ user, notes, onAdd }: { user: User, notes: Note[], onAdd
               </div>
             ) : (
               <div className="space-y-2">
-                <Label className="font-bold">File URL / Link</Label>
+                <Label className="text-[10px] font-black uppercase text-slate-400">File URL / Link</Label>
                 <div className="flex gap-2">
                   <Input 
                     value={fileUrl} 
                     onChange={e => setFileUrl(e.target.value)} 
-                    placeholder="Paste Google Drive or PDF link here" 
+                    placeholder="Paste Drive or PDF link" 
                     required 
-                    className="h-12"
+                    className="h-12 rounded-xl flex-1"
                   />
-                  <Button type="button" variant="outline" className="h-12 px-4" onClick={() => toast.info('File upload simulation: Link captured!')}>
+                  <Button type="button" variant="outline" className="h-12 w-12 p-0 rounded-xl" onClick={() => toast.info('Link captured!')}>
                     <Paperclip className="w-4 h-4" />
                   </Button>
                 </div>
-                <p className="text-[10px] text-slate-500 italic">Students will be able to download or view this file directly.</p>
               </div>
             )}
             
-            <Button type="submit" className="w-full h-12 bg-blue-600 hover:bg-blue-700 font-bold shadow-lg shadow-blue-200">
-              <Send className="w-4 h-4 mr-2" /> Publish Material
+            <Button type="submit" className="w-full h-12 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-black uppercase tracking-widest shadow-lg shadow-indigo-100">
+              <Send className="w-4 h-4 mr-2" /> Publish Now
             </Button>
           </form>
         </CardContent>
       </Card>
 
-      <Card className="shadow-xl border-white/40 bg-white/80 backdrop-blur-md">
-        <CardHeader>
-          <CardTitle className="text-xl font-black tracking-tight">Published Materials</CardTitle>
-          <CardDescription>All study resources shared so far</CardDescription>
+      <Card className="shadow-xl border-white/40 bg-white/80 backdrop-blur-md rounded-[2rem] overflow-hidden flex flex-col">
+        <CardHeader className="bg-slate-50 border-b border-slate-100">
+          <CardTitle className="text-xl font-black tracking-tight uppercase italic text-slate-900 leading-none">Shared Materials</CardTitle>
+          <CardDescription className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Manage published study resources</CardDescription>
         </CardHeader>
-        <CardContent>
-          <ScrollArea className="h-[600px] pr-4">
-            <div className="space-y-4">
+        <CardContent className="p-0 flex-1">
+          <ScrollArea className="h-[600px]">
+            <div className="divide-y divide-slate-50">
               {notes.map(note => (
-                <div key={note.id} className="p-5 border border-slate-100 rounded-2xl bg-white shadow-sm hover:shadow-md transition-shadow group">
-                  <div className="flex justify-between items-start mb-3">
-                    <div className="flex items-center gap-3">
-                      <div className={`p-2 rounded-lg ${note.type === 'file' ? 'bg-orange-100 text-orange-600' : 'bg-blue-100 text-blue-600'}`}>
-                        {note.type === 'file' ? <FileText className="w-4 h-4" /> : <BookOpen className="w-4 h-4" />}
-                      </div>
-                      <h4 className="font-black text-slate-900">{note.title}</h4>
+                <div key={note.id} className="p-5 flex items-center justify-between hover:bg-slate-50/50 transition-colors">
+                  <div className="flex items-center gap-4">
+                    <div className={`h-12 w-12 rounded-2xl flex items-center justify-center ${note.type === 'file' ? 'bg-orange-100 text-orange-600' : 'bg-indigo-100 text-indigo-600'}`}>
+                      {note.type === 'file' ? <FileText className="w-5 h-5" /> : <BookOpen className="w-5 h-5" />}
                     </div>
-                    <div className="flex items-center gap-2">
-                      <Badge className="bg-slate-100 text-slate-600 hover:bg-slate-200 border-none">Class {note.classId}</Badge>
-                      {user.isSubscriptionPaid && (
-                        <div className="flex gap-1">
-                          <Button variant="ghost" size="icon" className="h-7 w-7 text-blue-600 hover:bg-blue-50" onClick={() => {
-                            const newTitle = prompt('Edit Title:', note.title);
-                            if (newTitle) {
-                              toast.info('Update logic would sync to store here.');
-                            }
-                          }}>
-                            <Edit2 className="h-3 w-3" />
-                          </Button>
-                          <Button variant="ghost" size="icon" className="h-7 w-7 text-red-600 hover:bg-red-50" onClick={() => {
-                            if (confirm('Delete this note?')) {
-                              toast.success('Note deleted');
-                            }
-                          }}>
-                            <Trash2 className="h-3 w-3" />
-                          </Button>
-                        </div>
-                      )}
+                    <div>
+                      <p className="font-black text-slate-900 text-sm uppercase italic leading-tight">{note.title}</p>
+                      <div className="flex items-center gap-2 mt-1">
+                         <Badge variant="outline" className="h-4 px-1.5 text-[8px] font-black tracking-tighter uppercase rounded-md text-slate-400 border-slate-200">Class {note.classId}</Badge>
+                         <p className="text-[8px] font-bold text-slate-400 uppercase">{new Date(note.createdAt).toLocaleDateString()}</p>
+                      </div>
                     </div>
                   </div>
-                  <p className="text-sm text-slate-600 line-clamp-2 mb-4 leading-relaxed">
-                    {note.type === 'file' ? `Attached File: ${note.fileUrl}` : note.content}
-                  </p>
-                  <div className="flex items-center justify-between pt-4 border-t border-slate-50">
-                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-                      {new Date(note.createdAt).toLocaleDateString()}
-                    </span>
-                    {note.type === 'file' && (
-                      <Button variant="ghost" size="sm" className="text-blue-600 font-bold h-8" onClick={() => window.open(note.fileUrl, '_blank')}>
-                        <Download className="w-3 h-3 mr-1" /> Download
-                      </Button>
-                    )}
+                  <div className="flex items-center gap-4">
+                    <div className="flex flex-col items-end gap-1">
+                      <Label className="text-[8px] font-black uppercase text-slate-400 leading-none">
+                        {note.isPublished !== false ? 'Published' : 'Hidden'}
+                      </Label>
+                      <Checkbox 
+                        checked={note.isPublished !== false}
+                        onCheckedChange={() => togglePublished(note.id)}
+                        className="rounded-md border-slate-300 data-[state=checked]:bg-indigo-600 data-[state=checked]:border-indigo-600 h-4 w-4"
+                      />
+                    </div>
+                    <Button variant="ghost" size="icon" className="h-10 w-10 text-red-400 hover:bg-red-50 hover:text-red-600 rounded-xl" onClick={() => {
+                      if(confirm('Delete this note?')) {
+                        onUpdate(notes.filter(n => n.id !== note.id));
+                        toast.success('Note deleted');
+                      }
+                    }}>
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
                   </div>
                 </div>
               ))}
               {notes.length === 0 && (
-                <div className="flex flex-col items-center justify-center py-20 text-slate-400">
-                  <BookOpen className="w-12 h-12 mb-4 opacity-20" />
-                  <p>No materials published yet</p>
-                </div>
+                <div className="p-20 text-center text-slate-400 italic text-sm">No notes have been shared yet</div>
               )}
             </div>
           </ScrollArea>
@@ -2183,41 +2264,159 @@ function MCQManagerSection({ exams, onUpdate }: { exams: Exam[], onUpdate: (exam
   );
 }
 
-function ResultsSection({ results }: { results: Result[] }) {
+function ResultsSection({ results, exams, students, onUpdateExam }: { 
+  results: Result[], 
+  exams: Exam[], 
+  students: User[],
+  onUpdateExam: (exam: Exam) => void 
+}) {
+  const [selectedClass, setSelectedClass] = useState<string | null>(null);
+  
+  const classes = Array.from(new Set(students.map(s => s.class))).sort((a, b) => Number(a) - Number(b));
+  
+  const filteredResults = selectedClass 
+    ? results.filter(r => {
+        const student = students.find(s => s.id === r.studentId);
+        return student?.class === selectedClass;
+      })
+    : results;
+
+  const sendWhatsApp = (phone: string, message: string) => {
+    const url = `https://wa.me/${phone.startsWith('91') ? phone : '91' + phone}?text=${encodeURIComponent(message)}`;
+    window.open(url, '_blank');
+  };
+
+  const shareResult = (res: Result) => {
+    const message = `🎯 Rupak Math Academy Result Update\n\nStudent: ${res.studentName}\nExam: ${res.examTitle}\nScore: ${res.score}/${res.total}\nPercentage: ${((res.score/res.total) * 100).toFixed(1)}%\n\nKeep growing! 🚀`;
+    const student = students.find(s => s.id === res.studentId);
+    if (student?.whatsapp) {
+      sendWhatsApp(student.whatsapp, message);
+    } else {
+      toast.error('Student WhatsApp number not found');
+    }
+  };
+
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>All Results</CardTitle>
-        <CardDescription>Student performance across all exams</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Student</TableHead>
-              <TableHead>Exam</TableHead>
-              <TableHead>Score</TableHead>
-              <TableHead>Date</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {results.map(res => (
-              <TableRow key={res.id}>
-                <TableCell className="font-medium">{res.studentName}</TableCell>
-                <TableCell>{res.examTitle}</TableCell>
-                <TableCell>
-                  <Badge variant={res.score / res.total >= 0.4 ? 'default' : 'destructive'}>
-                    {res.score}/{res.total}
-                  </Badge>
-                </TableCell>
-                <TableCell>{new Date(res.timestamp).toLocaleDateString()}</TableCell>
-              </TableRow>
-            ))}
-            {results.length === 0 && <TableRow><TableCell colSpan={4} className="text-center py-10">No results yet</TableCell></TableRow>}
-          </TableBody>
-        </Table>
-      </CardContent>
-    </Card>
+    <div className="space-y-6">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-6 rounded-[2rem] shadow-xl shadow-slate-200/50 border border-slate-100">
+        <div>
+          <h2 className="text-2xl font-black italic uppercase tracking-tighter text-slate-900">Academic Results</h2>
+          <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Class-wise performance tracking</p>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          <Button 
+            variant={selectedClass === null ? 'default' : 'outline'} 
+            onClick={() => setSelectedClass(null)}
+            className="rounded-xl h-10 px-4 text-[10px] font-bold uppercase"
+          >
+            All Classes
+          </Button>
+          {classes.map(cls => (
+            <Button 
+              key={cls}
+              variant={selectedClass === cls ? 'default' : 'outline'}
+              onClick={() => setSelectedClass(cls)}
+              className={`rounded-xl h-10 px-4 text-[10px] font-bold uppercase transition-all ${selectedClass === cls ? 'bg-indigo-600' : ''}`}
+            >
+              Results of Class {cls}
+            </Button>
+          ))}
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Exams Publishing Status */}
+        <Card className="border-none shadow-xl rounded-[2rem] overflow-hidden">
+          <CardHeader className="bg-slate-50 border-b border-slate-100">
+            <CardTitle className="text-lg font-black uppercase italic tracking-tight">Published Scoreboards</CardTitle>
+            <CardDescription className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Visibility on student dashboard</CardDescription>
+          </CardHeader>
+          <CardContent className="p-0">
+            <ScrollArea className="h-[400px]">
+              <div className="divide-y divide-slate-50">
+                {exams.filter(e => e.published).map(exam => (
+                  <div key={exam.id} className="p-4 flex items-center justify-between hover:bg-slate-50/50 transition-colors">
+                    <div>
+                      <p className="font-bold text-slate-900 text-sm">{exam.title}</p>
+                      <p className="text-[10px] text-slate-400 font-bold uppercase">Class {exam.classId} • {exam.questions.length} Qs</p>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <Label className="text-[10px] font-black pointer-events-none uppercase text-slate-400">
+                        {exam.resultsPublished ? 'Published' : 'Hidden'}
+                      </Label>
+                      <Checkbox 
+                        checked={exam.resultsPublished} 
+                        onCheckedChange={(checked) => onUpdateExam({ ...exam, resultsPublished: !!checked })}
+                        className="rounded-md border-slate-300 data-[state=checked]:bg-emerald-500 data-[state=checked]:border-emerald-500"
+                      />
+                    </div>
+                  </div>
+                ))}
+                {exams.filter(e => e.published).length === 0 && (
+                  <div className="p-20 text-center text-slate-400 italic text-xs">No published exams for results</div>
+                )}
+              </div>
+            </ScrollArea>
+          </CardContent>
+        </Card>
+
+        {/* Individual Results List */}
+        <Card className="border-none shadow-xl rounded-[2rem] overflow-hidden flex flex-col">
+          <CardHeader className="bg-slate-50 border-b border-slate-100 flex flex-row items-center justify-between">
+            <div>
+              <CardTitle className="text-lg font-black uppercase italic tracking-tight">Student Scores</CardTitle>
+              <CardDescription className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{selectedClass ? `Class ${selectedClass}` : 'Global'} Performance</CardDescription>
+            </div>
+            <Activity className="w-5 h-5 text-indigo-400" />
+          </CardHeader>
+          <CardContent className="p-0 flex-1">
+            <ScrollArea className="h-[400px]">
+              <Table>
+                <TableHeader className="bg-slate-50/50">
+                  <TableRow>
+                    <TableHead className="text-[10px] font-black uppercase">Student</TableHead>
+                    <TableHead className="text-[10px] font-black uppercase">Exam</TableHead>
+                    <TableHead className="text-[10px] font-black uppercase">Score</TableHead>
+                    <TableHead className="text-[10px] font-black uppercase text-right">Action</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {filteredResults.map(res => (
+                    <TableRow key={res.id} className="hover:bg-slate-50/50">
+                      <TableCell className="font-bold text-slate-800 text-xs">
+                        {res.studentName}
+                        <p className="text-[8px] text-slate-400 font-bold uppercase">{students.find(s => s.id === res.studentId)?.class ? `Class ${students.find(s => s.id === res.studentId)?.class}` : 'Unassigned'}</p>
+                      </TableCell>
+                      <TableCell className="text-[10px] text-slate-600 font-medium">{res.examTitle}</TableCell>
+                      <TableCell>
+                        <Badge className={`${res.score / res.total >= 0.7 ? 'bg-emerald-500' : 'bg-amber-500'} text-[10px] font-black h-5`}>
+                          {res.score}/{res.total}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          className="h-8 w-8 text-emerald-600 hover:bg-emerald-50 rounded-lg"
+                          onClick={() => shareResult(res)}
+                        >
+                          <MessageSquare className="w-4 h-4" />
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                  {filteredResults.length === 0 && (
+                    <TableRow>
+                      <TableCell colSpan={4} className="text-center py-20 text-slate-400 italic text-xs">No result records found for this selection</TableCell>
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
+            </ScrollArea>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
   );
 }
 
@@ -2299,5 +2498,264 @@ function AttendanceSection({ students, attendance, onUpdate }: { students: User[
         </Table>
       </CardContent>
     </Card>
+  );
+}
+
+function GrowthSection({ students, payments }: { students: User[], payments: Payment[] }) {
+  const enrollmentData = {
+    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+    datasets: [
+      {
+        label: 'Enrollment',
+        data: [12, 19, 25, 32, 45, students.length],
+        backgroundColor: 'rgba(99, 102, 241, 0.5)',
+        borderColor: 'rgb(99, 102, 241)',
+        borderWidth: 2,
+        tension: 0.4,
+        fill: true,
+      },
+    ],
+  };
+
+  const revenueData = {
+    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+    datasets: [
+      {
+        label: 'Revenue (₹)',
+        data: [5000, 8000, 12000, 15000, 22000, students.filter(s => s.paymentStatus === 'paid').length * 500],
+        backgroundColor: 'rgba(34, 197, 94, 0.5)',
+        borderColor: 'rgb(34, 197, 94)',
+        borderWidth: 2,
+        borderRadius: 8,
+      },
+    ],
+  };
+
+  return (
+    <div className="space-y-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <Card className="shadow-xl rounded-[2rem] border-none overflow-hidden">
+          <CardHeader className="bg-slate-900 text-white">
+            <CardTitle className="text-xl font-black uppercase italic italic tracking-tight">Enrollment Over Time</CardTitle>
+            <CardDescription className="text-slate-400">Student growth metric based on registrations</CardDescription>
+          </CardHeader>
+          <CardContent className="pt-6">
+            <div className="h-[300px]">
+              <Line data={enrollmentData} options={{ maintainAspectRatio: false, plugins: { legend: { display: false } } }} />
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="shadow-xl rounded-[2rem] border-none overflow-hidden">
+          <CardHeader className="bg-slate-900 text-white">
+            <CardTitle className="text-xl font-black uppercase italic italic tracking-tight">Revenue Analysis</CardTitle>
+            <CardDescription className="text-slate-400">Monthly financial performance of the academy</CardDescription>
+          </CardHeader>
+          <CardContent className="pt-6">
+            <div className="h-[300px]">
+              <Bar data={revenueData} options={{ maintainAspectRatio: false, plugins: { legend: { display: false } } }} />
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <Card className="lg:col-span-1 shadow-lg rounded-[2rem]">
+          <CardHeader>
+            <CardTitle className="text-lg font-black uppercase italic tracking-tight">Key Insights</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="p-4 bg-blue-50 rounded-2xl border border-blue-100 italic">
+              <p className="text-sm font-bold text-blue-700">Highest Engagement</p>
+              <p className="text-xs text-blue-600 mt-1">Class 10 students are consistently active in tests.</p>
+            </div>
+            <div className="p-4 bg-emerald-50 rounded-2xl border border-emerald-100 italic">
+              <p className="text-sm font-bold text-emerald-700">Financial Health</p>
+              <p className="text-xs text-emerald-600 mt-1">78% students have cleared their dues this month.</p>
+            </div>
+            <div className="p-4 bg-amber-50 rounded-2xl border border-amber-100 italic">
+              <p className="text-sm font-bold text-amber-700">Expansion Need</p>
+              <p className="text-xs text-amber-600 mt-1">Junior batch enrollment increased by 20% since April.</p>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="lg:col-span-2 shadow-lg rounded-[2rem]">
+          <CardHeader>
+            <CardTitle className="text-lg font-black uppercase italic tracking-tight">Student Retention Details</CardTitle>
+          </CardHeader>
+          <CardContent>
+             <div className="space-y-6">
+               {[
+                 { label: 'Active Students', value: students.length, percentage: 100, color: 'bg-indigo-600' },
+                 { label: 'Paid Scholars', value: students.filter(s => s.paymentStatus === 'paid').length, percentage: (students.filter(s => s.paymentStatus === 'paid').length / students.length) * 100, color: 'bg-emerald-500' },
+                 { label: 'Exam Takers', value: Math.floor(students.length * 0.85), percentage: 85, color: 'bg-blue-500' },
+                 { label: 'Junior Batch', value: students.filter(s => s.batchType === 'Jr').length, percentage: (students.filter(s => s.batchType === 'Jr').length / students.length) * 100, color: 'bg-amber-500' },
+               ].map((item, i) => (
+                 <div key={i} className="space-y-2">
+                   <div className="flex justify-between items-center text-xs font-black uppercase tracking-widest text-slate-500">
+                     <span>{item.label}</span>
+                     <span>{item.value} / {students.length}</span>
+                   </div>
+                   <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
+                     <div className={`h-full ${item.color} rounded-full`} style={{ width: `${item.percentage}%` }} />
+                   </div>
+                 </div>
+               ))}
+             </div>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  );
+}
+
+function TimetableSection({ timetable, onUpdate }: { timetable: TimetableEntry[], onUpdate: (t: TimetableEntry[]) => void }) {
+  const [isAdding, setIsAdding] = useState(false);
+  const [newEntry, setNewEntry] = useState<Partial<TimetableEntry>>({
+    classId: '10',
+    batchType: 'Jr',
+    day: 'Monday',
+    time: '',
+    subject: ''
+  });
+
+  const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+
+  const handleAdd = () => {
+    if (!newEntry.time || !newEntry.subject) {
+      toast.error('Please fill all class details');
+      return;
+    }
+    const entry: TimetableEntry = {
+      id: Date.now().toString(),
+      classId: newEntry.classId!,
+      batchType: newEntry.batchType!,
+      day: newEntry.day!,
+      time: newEntry.time!,
+      subject: newEntry.subject!
+    };
+    onUpdate([...timetable, entry]);
+    setNewEntry({ ...newEntry, time: '', subject: '' });
+    setIsAdding(false);
+    toast.success('Class scheduled successfully');
+  };
+
+  const handleDelete = (id: string) => {
+    onUpdate(timetable.filter(e => e.id !== id));
+    toast.success('Class removed from schedule');
+  };
+
+  return (
+    <div className="space-y-6">
+      <div className="flex justify-between items-center bg-white p-6 rounded-[2rem] shadow-lg border border-slate-100">
+        <div>
+          <h2 className="text-2xl font-black italic uppercase tracking-tighter text-slate-900 leading-none">Class Timetable</h2>
+          <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mt-2">Manage academy schedule & coaching slots</p>
+        </div>
+        <Button onClick={() => setIsAdding(true)} className="bg-blue-600 hover:bg-blue-700 h-12 rounded-xl font-black uppercase tracking-widest italic shadow-xl shadow-blue-500/20">
+          <Plus className="mr-2 w-4 h-4" /> Add Session
+        </Button>
+      </div>
+
+      <Dialog open={isAdding} onOpenChange={setIsAdding}>
+        <DialogContent className="max-w-md bg-white rounded-3xl p-8 border-none shadow-2xl">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-black italic uppercase tracking-tighter">Schedule New Class</DialogTitle>
+            <DialogDescription>Assign a new coaching slot to a batch</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+             <div className="grid grid-cols-2 gap-4">
+               <div>
+                 <Label className="text-[10px] uppercase font-black text-slate-400">Class</Label>
+                 <Select value={newEntry.classId} onValueChange={(v) => setNewEntry({...newEntry, classId: v})}>
+                   <SelectTrigger className="mt-1 h-11 rounded-xl"><SelectValue /></SelectTrigger>
+                   <SelectContent>
+                     {['5','6','7','8','9','10','11','12'].map(c => <SelectItem key={c} value={c}>Class {c}</SelectItem>)}
+                   </SelectContent>
+                 </Select>
+               </div>
+               <div>
+                 <Label className="text-[10px] uppercase font-black text-slate-400">Batch</Label>
+                 <Select value={newEntry.batchType} onValueChange={(v) => setNewEntry({...newEntry, batchType: v as 'Sr' | 'Jr'})}>
+                   <SelectTrigger className="mt-1 h-11 rounded-xl"><SelectValue /></SelectTrigger>
+                   <SelectContent>
+                     <SelectItem value="Sr">Senior (Sr)</SelectItem>
+                     <SelectItem value="Jr">Junior (Jr)</SelectItem>
+                   </SelectContent>
+                 </Select>
+               </div>
+             </div>
+             
+             <div>
+               <Label className="text-[10px] uppercase font-black text-slate-400">Day of Week</Label>
+               <Select value={newEntry.day} onValueChange={(v) => setNewEntry({...newEntry, day: v})}>
+                 <SelectTrigger className="mt-1 h-11 rounded-xl"><SelectValue /></SelectTrigger>
+                 <SelectContent>
+                   {DAYS.map(d => <SelectItem key={d} value={d}>{d}</SelectItem>)}
+                 </SelectContent>
+               </Select>
+             </div>
+
+             <div className="grid grid-cols-2 gap-4">
+               <div>
+                 <Label className="text-[10px] uppercase font-black text-slate-400">Time Label</Label>
+                 <Input value={newEntry.time} onChange={(e) => setNewEntry({...newEntry, time: e.target.value})} placeholder="e.g. 5:00 PM" className="mt-1 h-11 rounded-xl" />
+               </div>
+               <div>
+                 <Label className="text-[10px] uppercase font-black text-slate-400">Subject</Label>
+                 <Input value={newEntry.subject} onChange={(e) => setNewEntry({...newEntry, subject: e.target.value})} placeholder="e.g. Mathematics" className="mt-1 h-11 rounded-xl" />
+               </div>
+             </div>
+          </div>
+          <div className="flex gap-2">
+            <Button className="flex-1 bg-slate-900 h-12 rounded-xl font-bold uppercase tracking-widest" onClick={handleAdd}>Add to Schedule</Button>
+            <Button variant="outline" className="h-12 rounded-xl font-bold" onClick={() => setIsAdding(false)}>Cancel</Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {DAYS.map(day => {
+          const dayEntries = timetable.filter(e => e.day === day);
+          return (
+            <Card key={day} className="border-none shadow-xl rounded-[2rem] overflow-hidden bg-white/80 backdrop-blur-sm">
+              <CardHeader className="bg-slate-50 border-b border-slate-100 py-4">
+                <CardTitle className="text-lg font-black uppercase italic tracking-tight flex items-center justify-between">
+                  {day}
+                  <Badge variant="outline" className="text-[10px] font-black h-5 border-slate-200">{dayEntries.length}</Badge>
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="p-0">
+                <ScrollArea className="h-[300px]">
+                  <div className="divide-y divide-slate-50">
+                    {dayEntries.map(entry => (
+                      <div key={entry.id} className="p-4 flex items-center justify-between hover:bg-slate-50 transition-colors">
+                        <div>
+                          <p className="font-bold text-slate-900 text-sm">{entry.subject}</p>
+                          <div className="flex items-center gap-2 mt-1">
+                            <Badge className="bg-indigo-50 text-indigo-700 border-none text-[8px] h-4 rounded-md uppercase font-black">Class {entry.classId}</Badge>
+                            <span className="text-[10px] font-bold text-slate-400 italic">{entry.time}</span>
+                          </div>
+                        </div>
+                        <Button variant="ghost" size="icon" className="h-8 w-8 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-xl" onClick={() => handleDelete(entry.id)}>
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </Button>
+                      </div>
+                    ))}
+                    {dayEntries.length === 0 && (
+                      <div className="py-20 text-center">
+                        <Calendar className="w-8 h-8 text-slate-200 mx-auto mb-2" />
+                        <p className="text-[10px] font-black text-slate-300 uppercase italic">No Classes Today</p>
+                      </div>
+                    )}
+                  </div>
+                </ScrollArea>
+              </CardContent>
+            </Card>
+          );
+        })}
+      </div>
+    </div>
   );
 }

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Routes, Route, Link, useNavigate } from 'react-router-dom';
+import { Logo } from '@/components/Logo';
 import { 
   LayoutDashboard, 
   BookOpen, 
@@ -14,17 +15,21 @@ import {
   Trophy,
   Download,
   Users,
+  Award,
   MoreVertical,
   Settings,
   HelpCircle,
-  Paperclip
+  Paperclip,
+  Send
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { store } from '@/lib/store';
 import { User, Exam, Result, Note, Message, PaymentConfig } from '@/types';
@@ -51,7 +56,7 @@ export default function StudentDashboard({ user, onLogout }: StudentDashboardPro
 
     setExams(allExams.filter(e => e.classId === user.class && e.published));
     setResults(allResults.filter(r => r.studentId === user.id));
-    setNotes(allNotes.filter(n => n.classId === user.class));
+    setNotes(allNotes.filter(n => n.classId === user.class && (n.isPublished !== false)));
   }, [user.class, user.id]);
 
   const handleStartExam = (examId: string) => {
@@ -61,14 +66,12 @@ export default function StudentDashboard({ user, onLogout }: StudentDashboardPro
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col">
       {/* Top Navbar */}
-      <header className="h-16 bg-slate-900 text-white px-6 flex items-center justify-between sticky top-0 z-10 border-b border-white/5">
+      <header className="h-16 bg-slate-900 text-white px-4 sm:px-6 flex items-center justify-between sticky top-0 z-50 border-b border-white/10 shadow-lg">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 border-2 border-blue-500 rounded-full overflow-hidden shadow-lg bg-white p-0.5">
-            <img src="/input_file_0.png" alt="Infinity Logo" className="w-full h-full object-cover rounded-full" referrerPolicy="no-referrer" />
-          </div>
-          <div>
-            <h1 className="font-black text-lg leading-tight tracking-tighter italic">INFINITY BONGAON</h1>
-            <p className="text-[8px] text-blue-400 uppercase font-black tracking-[0.2em]">Practice makes perfect</p>
+          <Logo size="xs" className="border-2 border-blue-500/50" />
+          <div className="flex flex-col">
+            <h1 className="font-black text-lg sm:text-xl leading-tight tracking-tighter italic whitespace-nowrap">INFINITY BONGAON</h1>
+            <p className="text-[9px] text-blue-400 uppercase font-black tracking-[0.3em] leading-none">Practice makes perfect</p>
           </div>
         </div>
         <div className="flex items-center gap-3">
@@ -78,11 +81,11 @@ export default function StudentDashboard({ user, onLogout }: StudentDashboardPro
           </Button>
 
           <Sheet open={isMenuOpen} onOpenChange={setIsMenuOpen}>
-            <SheetTrigger asChild>
-              <Button variant="ghost" size="icon" className="text-white/70 hover:text-white">
+            <SheetTrigger render={
+              <button className="flex items-center justify-center h-10 w-10 text-white/70 hover:text-white rounded-lg hover:bg-white/10 transition-colors">
                 <MoreVertical className="h-5 w-5" />
-              </Button>
-            </SheetTrigger>
+              </button>
+            } />
               <SheetContent side="right" className="bg-slate-950 text-white border-none p-0 w-72 shadow-2xl">
                 <SheetHeader className="p-6 border-b border-white/5 bg-white/5 text-left">
                   <div className="flex items-center gap-3">
@@ -105,6 +108,12 @@ export default function StudentDashboard({ user, onLogout }: StudentDashboardPro
                     </Button>
                     <Button variant="ghost" className="w-full justify-start gap-3 h-11 hover:bg-white/10 text-slate-300" onClick={() => { setActiveTab('exams'); setIsMenuOpen(false); }}>
                       <FileText className="w-4 h-4" /> My Exams
+                    </Button>
+                    <Button variant="ghost" className="w-full justify-start gap-3 h-11 hover:bg-white/10 text-slate-300" onClick={() => { setActiveTab('notes'); setIsMenuOpen(false); }}>
+                      <BookOpen className="w-4 h-4" /> Study Notes
+                    </Button>
+                    <Button variant="ghost" className="w-full justify-start gap-3 h-11 hover:bg-white/10 text-slate-300" onClick={() => { setActiveTab('due'); setIsMenuOpen(false); }}>
+                      <CreditCard className="w-4 h-4" /> My Dues
                     </Button>
                     <Button variant="ghost" className="w-full justify-start gap-3 h-11 hover:bg-white/10 text-slate-300" onClick={() => { setActiveTab('results'); setIsMenuOpen(false); }}>
                       <Trophy className="w-4 h-4" /> Performance
@@ -130,9 +139,9 @@ export default function StudentDashboard({ user, onLogout }: StudentDashboardPro
         </div>
       </header>
 
-      <div className="flex-1 flex overflow-hidden">
+      <div className="flex-1 flex overflow-visible">
         {/* Sidebar */}
-        <aside className="hidden md:flex md:w-64 bg-white border-r flex-col">
+        <aside className="hidden md:flex md:w-64 bg-white border-r flex-col sticky top-16 h-[calc(100vh-64px)] overflow-y-auto">
           <nav className="flex-1 p-4 space-y-2">
             <SidebarItem icon={<LayoutDashboard />} label="Dashboard" active={activeTab === 'dashboard'} onClick={() => setActiveTab('dashboard')} />
             <SidebarItem icon={<FileText />} label="Exams" active={activeTab === 'exams'} onClick={() => setActiveTab('exams')} />
@@ -144,8 +153,8 @@ export default function StudentDashboard({ user, onLogout }: StudentDashboardPro
         </aside>
 
         {/* Main Content */}
-        <main className="flex-1 overflow-hidden flex flex-col">
-          <ScrollArea className="flex-1 p-4 md:p-6">
+        <main className="flex-1 flex flex-col bg-slate-50 overflow-x-hidden pb-24 md:pb-0">
+          <div className="p-4 md:p-8 max-w-7xl mx-auto w-full space-y-6">
               <div key={activeTab}>
                 {activeTab === 'dashboard' && (
                   <div className="space-y-6">
@@ -285,7 +294,6 @@ export default function StudentDashboard({ user, onLogout }: StudentDashboardPro
                                       <Button 
                                         variant="ghost" 
                                         size="sm" 
-                                        asChild
                                         className="w-full text-[10px] font-black uppercase tracking-widest hover:bg-blue-600 hover:text-white transition-all text-blue-600 cursor-pointer"
                                       >
                                         <div>
@@ -393,6 +401,10 @@ export default function StudentDashboard({ user, onLogout }: StudentDashboardPro
                   </div>
                 )}
 
+                {activeTab === 'chats' && (
+                  <StudentChatSection user={user} />
+                )}
+
                 {activeTab === 'profile' && (
                   <div className="max-w-2xl mx-auto space-y-6">
                     <Card>
@@ -441,45 +453,239 @@ export default function StudentDashboard({ user, onLogout }: StudentDashboardPro
                 )}
 
                 {activeTab === 'results' && (
-                  <div className="space-y-6">
-                    <h2 className="text-2xl font-bold">My Performance</h2>
-                    <Card>
-                      <CardContent className="p-0">
-                        <Table>
-                          <TableHeader>
-                            <TableRow>
-                              <TableHead>Exam Title</TableHead>
-                              <TableHead>Date</TableHead>
-                              <TableHead>Score</TableHead>
-                              <TableHead>Percentage</TableHead>
-                              <TableHead>Action</TableHead>
-                            </TableRow>
-                          </TableHeader>
-                          <TableBody>
-                            {results.map(res => (
-                              <TableRow key={res.id}>
-                                <TableCell className="font-medium">{res.examTitle}</TableCell>
-                                <TableCell>{new Date(res.timestamp).toLocaleDateString()}</TableCell>
-                                <TableCell>{res.score}/{res.total}</TableCell>
-                                <TableCell>{Math.round((res.score / res.total) * 100)}%</TableCell>
-                                <TableCell>
-                                  <Button variant="ghost" size="sm" onClick={() => navigate(`/results/${res.id}`)}>
-                                    View Details <ChevronRight className="ml-1 h-4 w-4" />
-                                  </Button>
-                                </TableCell>
-                              </TableRow>
-                            ))}
-                            {results.length === 0 && <TableRow><TableCell colSpan={5} className="text-center text-slate-400 py-10">No results found</TableCell></TableRow>}
-                          </TableBody>
-                        </Table>
-                      </CardContent>
-                    </Card>
+                  <div className="space-y-8">
+                    <div className="flex items-center justify-between">
+                      <h2 className="text-2xl font-black uppercase italic tracking-tight text-slate-900 leading-none">Result Analytics</h2>
+                      <Trophy className="w-6 h-6 text-indigo-600" />
+                    </div>
+
+                    <Tabs defaultValue="my-scores" className="w-full">
+                      <TabsList className="bg-slate-100/50 p-1 rounded-2xl mb-6">
+                        <TabsTrigger value="my-scores" className="rounded-xl font-bold text-xs px-6 py-3">My Performance</TabsTrigger>
+                        <TabsTrigger value="class-chart" className="rounded-xl font-bold text-xs px-6 py-3">Class Result Chart</TabsTrigger>
+                      </TabsList>
+
+                      <TabsContent value="my-scores">
+                        <Card className="border-none shadow-xl rounded-[2rem] overflow-hidden">
+                          <CardContent className="p-0">
+                            <Table>
+                              <TableHeader className="bg-slate-50/50">
+                                <TableRow>
+                                  <TableHead className="text-[10px] font-black uppercase">Exam Title</TableHead>
+                                  <TableHead className="text-[10px] font-black uppercase">Date</TableHead>
+                                  <TableHead className="text-[10px] font-black uppercase">Score</TableHead>
+                                  <TableHead className="text-[10px] font-black uppercase text-right">Action</TableHead>
+                                </TableRow>
+                              </TableHeader>
+                              <TableBody>
+                                {results.map(res => (
+                                  <TableRow key={res.id} className="hover:bg-slate-50/50 transition-colors">
+                                    <TableCell className="font-bold text-slate-800 text-xs">{res.examTitle}</TableCell>
+                                    <TableCell className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">{new Date(res.timestamp).toLocaleDateString()}</TableCell>
+                                    <TableCell>
+                                      <Badge className={`${res.score / res.total >= 0.7 ? 'bg-emerald-500' : 'bg-indigo-600'} text-[10px] font-black h-5`}>
+                                        {res.score}/{res.total}
+                                      </Badge>
+                                    </TableCell>
+                                    <TableCell className="text-right">
+                                      <Button variant="ghost" size="sm" className="h-8 rounded-lg text-xs font-bold text-indigo-600 hover:bg-indigo-50" onClick={() => navigate(`/results/${res.id}`)}>
+                                        Details <ChevronRight className="ml-1 h-3 w-3" />
+                                      </Button>
+                                    </TableCell>
+                                  </TableRow>
+                                ))}
+                                {results.length === 0 && <TableRow><TableCell colSpan={4} className="text-center text-slate-400 py-20 font-bold uppercase italic tracking-widest text-xs">No exams taken yet</TableCell></TableRow>}
+                              </TableBody>
+                            </Table>
+                          </CardContent>
+                        </Card>
+                      </TabsContent>
+
+                      <TabsContent value="class-chart">
+                        <div className="space-y-6">
+                           {store.getExams().filter(e => e.classId === user.class && e.resultsPublished).length === 0 ? (
+                             <div className="py-20 text-center bg-white rounded-[2rem] shadow-xl border border-dashed border-slate-200">
+                               <p className="text-slate-400 font-black uppercase italic tracking-widest text-sm">No full result charts published yet</p>
+                               <p className="text-[10px] text-slate-300 font-bold uppercase mt-2 tracking-widest">Wait for your teacher to publish class rankings</p>
+                             </div>
+                           ) : (
+                             store.getExams().filter(e => e.classId === user.class && e.resultsPublished).map(exam => {
+                               const examResults = store.getResults().filter(r => r.examId === exam.id).sort((a, b) => b.score - a.score);
+                               
+                               return (
+                                 <Card key={exam.id} className="border-none shadow-xl rounded-[2rem] overflow-hidden">
+                                   <CardHeader className="bg-slate-900 text-white">
+                                     <div className="flex justify-between items-center">
+                                       <div>
+                                         <CardTitle className="text-lg font-black uppercase italic tracking-tight">{exam.title}</CardTitle>
+                                         <CardDescription className="text-white/60 text-[10px] font-bold uppercase tracking-widest">Full Class Scoreboard</CardDescription>
+                                       </div>
+                                       <Award className="w-8 h-8 text-amber-400" />
+                                     </div>
+                                   </CardHeader>
+                                   <CardContent className="p-0">
+                                     <Table>
+                                       <TableHeader className="bg-slate-50/50">
+                                         <TableRow>
+                                           <TableHead className="w-12 text-[10px] font-black uppercase">Rank</TableHead>
+                                           <TableHead className="text-[10px] font-black uppercase">Student</TableHead>
+                                           <TableHead className="text-[10px] font-black uppercase">Score</TableHead>
+                                           <TableHead className="text-[10px] font-black uppercase text-right">Badge</TableHead>
+                                         </TableRow>
+                                       </TableHeader>
+                                       <TableBody>
+                                         {examResults.map((res, index) => (
+                                           <TableRow key={res.id} className={res.studentId === user.id ? "bg-indigo-50/50" : ""}>
+                                             <TableCell className="font-black text-slate-400 italic text-sm">#{index + 1}</TableCell>
+                                             <TableCell className="font-bold text-slate-800 text-xs">
+                                               {res.studentName}
+                                               {res.studentId === user.id && <span className="ml-2 text-[8px] bg-indigo-100 text-indigo-600 px-1.5 py-0.5 rounded-full uppercase">You</span>}
+                                             </TableCell>
+                                             <TableCell className="font-black text-slate-900 text-sm italic">{res.score}/{res.total}</TableCell>
+                                             <TableCell className="text-right">
+                                               {index === 0 && <Badge className="bg-amber-400 text-amber-950 font-black tracking-tighter italic">GOLD</Badge>}
+                                               {index === 1 && <Badge className="bg-slate-300 text-slate-950 font-black tracking-tighter italic">SILVER</Badge>}
+                                               {index === 2 && <Badge className="bg-orange-300 text-orange-950 font-black tracking-tighter italic">BRONZE</Badge>}
+                                             </TableCell>
+                                           </TableRow>
+                                         ))}
+                                       </TableBody>
+                                     </Table>
+                                   </CardContent>
+                                 </Card>
+                               );
+                             })
+                           )}
+                        </div>
+                      </TabsContent>
+                    </Tabs>
                   </div>
                 )}
               </div>
-          </ScrollArea>
+          </div>
         </main>
       </div>
+      
+      {/* Mobile Bar Navigation */}
+      <div className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-slate-900 border-t border-white/10 px-6 py-2 pb-safe shadow-[0_-10px_40px_rgba(0,0,0,0.3)] flex items-center justify-between">
+        <button 
+          onClick={() => setActiveTab('dashboard')}
+          className={`flex flex-col items-center justify-center gap-1 transition-all ${activeTab === 'dashboard' ? 'text-blue-400' : 'text-slate-400'}`}
+        >
+          <LayoutDashboard className="w-6 h-6" />
+          <span className="text-[8px] font-black uppercase tracking-widest leading-none">Dash</span>
+        </button>
+        
+        <button 
+          onClick={() => setActiveTab('exams')}
+          className={`flex flex-col items-center justify-center gap-1 transition-all ${activeTab === 'exams' ? 'text-blue-400' : 'text-slate-400'}`}
+        >
+          <FileText className="w-6 h-6" />
+          <span className="text-[8px] font-black uppercase tracking-widest leading-none">Exams</span>
+        </button>
+
+        <button 
+          onClick={() => setActiveTab('chats')}
+          className={`flex flex-col items-center justify-center gap-1 transition-all ${activeTab === 'chats' ? 'text-blue-400' : 'text-slate-400'}`}
+        >
+          <MessageCircle className="w-6 h-6" />
+          <span className="text-[8px] font-black uppercase tracking-widest leading-none">Chat</span>
+        </button>
+
+        <button 
+          onClick={() => setActiveTab('due')}
+          className={`flex flex-col items-center justify-center gap-1 transition-all ${activeTab === 'due' ? 'text-blue-400' : 'text-slate-400'}`}
+        >
+          <CreditCard className="w-6 h-6" />
+          <span className="text-[8px] font-black uppercase tracking-widest leading-none">Dues</span>
+        </button>
+
+        <button 
+          onClick={() => setIsMenuOpen(true)}
+          className="flex flex-col items-center justify-center gap-1 transition-all text-slate-400"
+        >
+          <MoreVertical className="w-6 h-6" />
+          <span className="text-[8px] font-black uppercase tracking-widest leading-none">More</span>
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function StudentChatSection({ user }: { user: User }) {
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [newMessage, setNewMessage] = useState('');
+  const classGroupName = `Infinity Class ${user.class}`;
+
+  useEffect(() => {
+    setMessages(store.getMessages().filter(m => m.classId === classGroupName || m.classId === 'Global Chat'));
+  }, [classGroupName]);
+
+  const handleSend = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newMessage.trim()) return;
+
+    const msg: Message = {
+      id: Date.now().toString(),
+      senderId: user.id,
+      senderName: user.name,
+      text: newMessage,
+      timestamp: Date.now(),
+      classId: classGroupName
+    };
+
+    const updated = [...store.getMessages(), msg];
+    store.setMessages(updated);
+    setMessages(updated.filter(m => m.classId === classGroupName || m.classId === 'Global Chat'));
+    setNewMessage('');
+    toast.success('Message sent');
+  };
+
+  return (
+    <div className="flex flex-col h-[calc(100vh-12rem)] md:h-[600px] bg-white rounded-3xl overflow-hidden shadow-2xl border border-slate-100 italic">
+      <div className="p-6 bg-slate-900 text-white flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div className="p-2 bg-blue-600 rounded-xl">
+            <Users className="w-5 h-5 text-white" />
+          </div>
+          <div>
+            <h3 className="text-xl font-black uppercase italic tracking-tighter shadow-sm">{classGroupName}</h3>
+            <p className="text-[10px] text-blue-400 font-bold uppercase tracking-widest">Connect with your peers</p>
+          </div>
+        </div>
+      </div>
+
+      <ScrollArea className="flex-1 p-6 bg-slate-50">
+        <div className="space-y-4">
+          {messages.map((msg) => (
+            <div key={msg.id} className={`flex flex-col ${msg.senderId === user.id ? 'items-end' : 'items-start'}`}>
+              <div className={`max-w-[80%] p-4 rounded-2xl shadow-sm ${
+                msg.senderId === user.id 
+                  ? 'bg-blue-600 text-white rounded-tr-none' 
+                  : 'bg-white border border-slate-100 text-slate-800 rounded-tl-none'
+              }`}>
+                <p className="text-[10px] font-black uppercase tracking-widest opacity-70 mb-1">{msg.senderName}</p>
+                <p className="text-sm font-bold leading-relaxed">{msg.text}</p>
+                <p className="text-[8px] font-black uppercase mt-2 opacity-50 tabular-nums">
+                  {new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                </p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </ScrollArea>
+
+      <form onSubmit={handleSend} className="p-4 bg-white border-t border-slate-100 flex gap-2">
+        <Input 
+          value={newMessage} 
+          onChange={(e) => setNewMessage(e.target.value)} 
+          placeholder="Write deep thoughts..." 
+          className="rounded-xl h-11 border-slate-200 focus:ring-blue-500 font-bold"
+        />
+        <Button type="submit" className="h-11 w-11 rounded-xl p-0 bg-blue-600 hover:bg-blue-700 shadow-lg shadow-blue-600/20">
+          <Send className="w-4 h-4" />
+        </Button>
+      </form>
     </div>
   );
 }

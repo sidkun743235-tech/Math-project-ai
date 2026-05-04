@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { Logo } from '@/components/Logo';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -48,6 +49,15 @@ export default function ResultsPage({ user }: ResultsPageProps) {
   return (
     <div className="min-h-screen bg-slate-50 p-4 md:p-8">
       <div className="max-w-4xl mx-auto space-y-8">
+        {/* Branding Header */}
+        <div className="flex flex-col items-center gap-6 mb-8">
+          <Logo size="md" className="border-4 border-blue-600/30 ring-4 ring-blue-500/10" />
+          <div className="text-center">
+            <h2 className="text-2xl font-black text-slate-800 tracking-tighter italic uppercase leading-none">INFINITY BONGAON</h2>
+            <p className="text-blue-600 font-bold tracking-[0.4em] uppercase text-[10px] mt-2">practice makes perfect</p>
+          </div>
+        </div>
+
         {/* Summary Card */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}

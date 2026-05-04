@@ -5,6 +5,8 @@ import AdminDashboard from './pages/AdminDashboard';
 import StudentDashboard from './pages/StudentDashboard';
 import ExamPage from './pages/ExamPage';
 import ResultsPage from './pages/ResultsPage';
+import AdminPaymentPage from './pages/AdminPaymentPage';
+import { AskAI } from './components/AskAI';
 import { store } from '@/lib/store';
 import React, { useEffect, useState } from 'react';
 import { User } from '@/types';
@@ -46,9 +48,11 @@ export default function App() {
           element={user ? <ResultsPage user={user} /> : <Navigate to="/login" />} 
         />
 
+        <Route path="/admin-payment" element={<AdminPaymentPage />} />
         <Route path="*" element={<Navigate to="/login" />} />
       </Routes>
       <Toaster position="top-right" />
+      <AskAI />
     </Router>
   );
 }

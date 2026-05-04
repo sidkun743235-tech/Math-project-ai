@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { Logo } from '@/components/Logo';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
@@ -96,9 +97,12 @@ export default function ExamPage({ user }: ExamPageProps) {
       <div className="max-w-4xl mx-auto space-y-6">
         {/* Header */}
         <div className="flex flex-col md:flex-row justify-between items-center gap-4 bg-white p-6 rounded-2xl border shadow-sm sticky top-4 z-20">
-          <div>
-            <h1 className="text-2xl font-bold text-slate-800">{exam.title}</h1>
-            <p className="text-sm text-slate-500">Question {currentQuestionIndex + 1} of {exam.questions.length}</p>
+          <div className="flex items-center gap-4">
+            <Logo size="sm" className="border-2 border-blue-600/50 shadow-sm" />
+            <div>
+              <h1 className="text-xl font-bold text-slate-800">{exam.title}</h1>
+              <p className="text-xs text-slate-500">Question {currentQuestionIndex + 1} of {exam.questions.length}</p>
+            </div>
           </div>
           <div className={`flex items-center gap-3 px-6 py-3 rounded-xl font-mono text-xl font-bold border-2 ${timeLeft < 60 ? 'bg-red-50 border-red-200 text-red-600 animate-pulse' : 'bg-indigo-50 border-indigo-100 text-indigo-600'}`}>
             <Clock className="w-6 h-6" />

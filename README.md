@@ -1,20 +1,37 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
+# Math Academy Management System
 
-# Run and deploy your AI Studio app
+A high-performance management dashboard for coaching centers and academies.
 
-This contains everything you need to run your app locally.
+## Features
+- **Admin Dashboard**: Growth analytics, revenue tracking, student retention.
+- **Student Management**: Profiles, attendance, and coaching schedules.
+- **Academic Tools**: Exam creation (MCQ & subjective), automated results.
+- **Communication**: Integrated WhatsApp reminders and internal chat.
+- **Financials**: Payment tracking, due lists, and digital receipts.
 
-View your app in AI Studio: https://ai.studio/apps/786361cd-cd9d-4e1b-97c4-63273a5fa217
+## How to Make Live (Production)
 
-## Run Locally
+### 1. Instant URL (Easiest)
+Click the **"Share"** button in the top right of the Google AI Studio interface. This provides a direct link anyone can use.
 
-**Prerequisites:**  Node.js
+### 2. Custom Domain (Vercel)
+1. **GitHub Export**: Go to **Settings > Export to GitHub** in the AI Studio menu.
+2. **Authorize**: Connect your GitHub account.
+3. **Vercel Deployment**:
+   - Go to [vercel.com](https://vercel.com).
+   - Click **"Add New" > "Project"**.
+   - Import the repository you just exported.
+   - Vercel will automatically detect Vite and deploy your site for free on a `.vercel.app` domain.
 
+### 3. Local Development
+```bash
+npm install
+npm run dev
+```
 
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+## Tech Stack
+- React 19 + Vite
+- Tailwind CSS (Pre-configured Utility Classes)
+- Lucide React (Icons)
+- Chart.js (Analytics)
+- Shadcn/UI (Components)
